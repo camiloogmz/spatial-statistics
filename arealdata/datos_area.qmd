@@ -1,0 +1,1044 @@
+---
+title: "Análisis de Datos de Área: El Analfabetismo en Nepal"
+author:
+  - name: "Camilo Gómez"
+    email: "cgomezfo@unal.edu.co"
+  - name: "Sebastián Olarte"
+    email: "seolarter@unal.edu.co"
+    
+execute:
+  warning: false
+  message: false
+bibliography: referencias.bib
+nocite: |
+  @*
+---
+
+```{r}
+#| echo: false
+#| error: false
+
+library(spdep)
+library(sf)
+library(sp)
+library(terra)
+library(tmap)
+library(RColorBrewer)
+library(tidyverse)
+library(dbscan)
+library(spatialreg)
+library(ggplot2)
+library(ggspatial)
+library(nortest)
+library(lmtest)
+library(mgcv)
+
+library(kableExtra)
+library(broom)
+library(sjPlot)
+
+```
+
+
+# Descripción Del Conjunto De Datos: International Aid to Nepal (2007–2014)
+
+El conjunto de datos utilizado corresponde al proyecto *International Aid to Nepal (2007–14)*, desarrollado por el *Center for Spatial Data Science (GeoDa Center)*. Su objetivo es integrar información geoespacial, socioeconómica y financiera que permita estudiar la pobreza, el desarrollo humano y la distribución de la ayuda internacional en los 75 distritos administrativos de Nepal. Este dataset combina datos espaciales y estadísticos.
+
+
+
+## Resumen General del Dataset
+
+| Característica           | Detalle                                             |
+|--------------------------|-----------------------------------------------------|
+| **Título**               | International Aid to Nepal (2007–14)               |
+| **Observaciones**        | 75 distritos (un polígono por distrito)            |
+| **Variables**            | 61 variables                                       |
+| **Cobertura temporal**   | 1991–2013 (ayuda internacional: 2007–2014)         |
+| **Fuentes principales**  | AidData y Open Nepal                               |
+| **Tipo de dato espacial**| Polígonos distritales (MULTIPOLYGON)               |
+| **CRS**                  | WGS84 – EPSG:4326                                  |
+| **Archivos shapefile**   | `.shp`, `.shx`, `.dbf`, `.prj`, `.qpj`             |
+
+
+
+## Categorías y Descripción de Variables
+
+Las 61 variables se organizan en cinco grupos temáticos principales.
+
+
+#### A. Variables de Identificación Geográfica
+
+| Variable   | Descripción                     | Unidad/Tipo |
+|-----------|---------------------------------|------------|
+| `id`      | Identificador único del distrito| Numérica   |
+| `name_1`  | Región administrativa           | Texto      |
+| `name_2`  | Zona administrativa             | Texto      |
+| `district`| Nombre del distrito             | Texto      |
+| `lon`     | Longitud del centroide          | Grados     |
+| `lat`     | Latitud del centroide           | Grados     |
+
+
+
+#### B. Indicadores de Pobreza y Economía
+
+| Variable    | Descripción                                 | Unidad  |
+|------------|---------------------------------------------|--------|
+| `DepEcProv`| Privación económica                         | Índice |
+| `PovIndex` | Índice de Pobreza Humana                    | Índice |
+| `PCInc`    | Ingreso per cápita                          | Rs.    |
+| `PCIncPPP` | Ingreso per cápita ajustado por PPA         | USD PPP|
+| `PCIncMP`  | Ingreso per cápita a precio de mercado      | Rs.    |
+
+
+#### C. Indicadores Sociales, Salud y Servicios
+
+| Variable     | Descripción                               | Unidad     |
+|-------------|-------------------------------------------|-----------|
+| `Population`| Población total                           | Personas  |
+| `MalKids`   | % de niños malnutridos (< 5 años)         | Porcentaje|
+| `Lif40`     | % que no alcanzará los 40 años            | Porcentaje|
+| `NoSafH20`  | % sin acceso a agua potable segura        | Porcentaje|
+| `VotNum`    | Número de votantes registrados            | Personas  |
+
+
+#### D. Indicadores Educativos (2012–2013)
+
+| Variable     | Descripción                              | Unidad     |
+|-------------|-------------------------------------------|-----------|
+| `BoyG1_5`   | Niños matriculados grado 1–5              | Número    |
+| `GirlG1_5`  | Niñas matriculadas grado 1–5              | Número    |
+| `KIDS1_5`   | Total niños grado 1–5                     | Número    |
+| `SchoolCnt` | Número de escuelas                        | Número    |
+| `SCHLPKID`  | Escuelas por 1.000 niños                  | Ratio     |
+| `SCHLPPOP`  | Escuelas por 1.000 habitantes             | Ratio     |
+| `AD_ILLIT`  | Analfabetismo adulto (2011)               | Porcentaje|
+| `AD_ILGT50` | 1 si analfabetismo > 50%, 0 en otro caso  | Binaria   |
+
+
+
+#### E. Variables de Ayuda Internacional
+
+Cada sector contiene dos variables: **`xxCAMT`** (monto comprometido) y **`xxDAMT`** (monto desembolsado).
+
+| Código | Sector                      | Código | Sector                         |
+|--------|-----------------------------|--------|--------------------------------|
+| AG     | Agricultura                 | HEALT  | Salud                          |
+| BANK   | Banca                       | HUM    | Ayuda humanitaria              |
+| COMM   | Comunicaciones              | IND    | Industria                      |
+| CON    | Conflicto                   | MUL    | Multisectorial                 |
+| EDU    | Educación                   | SOC    | Infraestructura social         |
+| ENGY   | Energía                     | TOUR   | Turismo                        |
+| ENV    | Medio ambiente              | TRAN   | Transporte y almacenamiento    |
+| FOR    | Silvicultura                | WAT    | Agua y saneamiento            |
+| GOV    | Gobierno y sociedad civil   | TOT    | Total general                  |
+
+
+# Lectura de Datos
+
+Se realiza la lectura de los datos de Nepal.
+
+```{r}
+#| code-fold: show
+nepal <- st_read("nepal/nepal.shp", quiet = TRUE) # Se leen los datos de Nepal
+
+nepal.st <- st_geometry(nepal) # Polígonos
+
+#st_crs(nepal) # CRS
+
+# Transformación a UTM
+
+nepal.utm <- st_transform(nepal, crs = 32645) 
+```
+
+
+La @fig-mapa_analfabetismo  muestra el mapa coroplético de la tasa de analfabetismo adulto en Nepal a nivel distrital. El mapa evidencia una marcada heterogeneidad espacial, con valores elevados concentrados principalmente en las regiones occidental y noroccidental del país, así como en parte de la franja sur, mientras que los niveles más bajos se observan en los distritos del centro y este.
+
+La distribución espacial de los valores sugiere la presencia de agrupamientos de distritos con tasas similares de analfabetismo, indicando que la variable no se distribuye de manera aleatoria en el territorio. Este patrón visual constituye una evidencia descriptiva inicial que motiva la aplicación de métodos de análisis espacial para evaluar formalmente la dependencia espacial.
+
+
+
+
+```{r}
+#| label: fig-mapa_analfabetismo
+#| fig-cap: "Mapa de la tasa de analfabetismo en Nepal por distrito"
+
+tmap_mode("view")
+
+tm_shape(nepal.utm) +
+  tm_polygons("ad_illit",
+              fill.scale = tm_scale_intervals(n = 5, 
+                                              style = "quantile", 
+                                              values = "brewer.reds"),
+              fill.legend = tm_legend(title = "Tasa de\nAnalfabetismo")) +
+  tm_title("") +
+  tm_layout(legend.position = c("left", "bottom"), frame = FALSE) +
+  tm_scalebar(position = c("right", "bottom")) +
+  tm_compass(position = c("right", "top"))
+```
+
+De esta forma, es posible ver que hay agrupaciones de distritos cuya tasa de analfabetismo es alta y otros para la cual la tasa es baja, indicando presencia de correlación espacial. Hacia el noroccidente y suroriente de Nepal se encuentran los distritos con una mayor tasa de analfabetismo.
+
+
+# Matriz de Vecindades 
+
+El primer paso consiste en definir los centroides de las áreas, que en este caso corresponden a los distritos de Nepal. Para ello, se emplean los centroides geométricos de cada distrito.
+
+```{r}
+#| code-fold: show
+
+coords <- st_coordinates(st_centroid(nepal.utm))
+
+```
+
+
+
+## Pesos Espaciales
+
+De esta forma, se procede con la definición de los vecinos para evaluar cuál es la matriz que mejor describe la relación espacial presente en los datos de analfabetismo de Nepal. En el caso de los vecinos físicos se obtienen las mismas conexiones para los métodos **queen** y **rook**.
+
+```{r}
+#| code-fold: show
+
+## Vecinos Físicos
+
+nepal.nb <- poly2nb(nepal.utm, queen = TRUE)
+nepal.lw_w <- nb2listw(nepal.nb, style = "W", zero.policy = TRUE)
+nepal.lw_b <- nb2listw(nepal.nb, style = "B", zero.policy = TRUE)
+
+## Vecinos basados en grafos
+
+tri.nb <- tri2nb(coords)
+tri.nb_w <- nb2listw(tri.nb, style = "W", zero.policy = TRUE)
+tri.nb_b <- nb2listw(tri.nb, style = "B", zero.policy = TRUE)
+
+
+soi.nb <- graph2nb(soi.graph(tri.nb, coords))
+soi.nb_w <- nb2listw(soi.nb, style = "W", zero.policy = TRUE)
+soi.nb_b <- nb2listw(soi.nb, style = "B", zero.policy = TRUE)
+
+
+relative.nb <- graph2nb(relativeneigh(coords))
+relative.nb_w <- nb2listw(relative.nb, style = "W", zero.policy = TRUE)
+relative.nb_b <- nb2listw(relative.nb, style = "B", zero.policy = TRUE)
+
+
+gabriel.nb <- graph2nb(gabrielneigh(coords), sym=TRUE)
+gabriel.nb_w <- nb2listw(gabriel.nb, style = "W", zero.policy = TRUE)
+gabriel.nb_b <- nb2listw(gabriel.nb, style = "B", zero.policy = TRUE)
+
+
+## Vecinos basados en distancia
+
+knn.nb_1 <- knn2nb(knearneigh(coords, k = 1))
+knn.nb_2 <- knn2nb(knearneigh(coords, k = 2))
+knn.nb_3 <- knn2nb(knearneigh(coords, k = 3))
+knn.nb_4 <- knn2nb(knearneigh(coords, k = 4))
+
+
+knn.nb_1_w <- nb2listw(knn.nb_1, style = "W", zero.policy = TRUE)
+knn.nb_1_b <- nb2listw(knn.nb_1, style = "B", zero.policy = TRUE)
+
+
+knn.nb_2_w <- nb2listw(knn.nb_2, style = "W", zero.policy = TRUE)
+knn.nb_2_b <- nb2listw(knn.nb_2, style = "B", zero.policy = TRUE)
+
+
+knn.nb_3_w <- nb2listw(knn.nb_3, style = "W", zero.policy = TRUE)
+knn.nb_3_b <- nb2listw(knn.nb_3, style = "B", zero.policy = TRUE)
+
+
+knn.nb_4_w <- nb2listw(knn.nb_4, style = "W", zero.policy = TRUE)
+knn.nb_4_b <- nb2listw(knn.nb_4, style = "B", zero.policy = TRUE)
+
+
+```
+
+Luego de haber definido las matrices de conectividad, se realiza la elección de la mejor con ayuda del test I de Morán: se realiza el test y se escoge la que de un menor $p$-valor. Primero se almacenan todas las matrices en una lista y se define una función para realizar el procedimiento. 
+
+El sistema de hipótesis que se quiere juzgar es el siguiente, donde $I$ representa el índice de Morán (@moraga2023):
+
+$$
+\begin{cases}
+H_0: I= \mathrm{E}[I] & \text{(no hay autocorrelación espacial)}\\
+\text{vs} \\
+H_1: I\not=\mathrm{E}[I] & \text{(hay autocorrelación espacial)}\\
+\end{cases}
+$$
+
+```{r}
+mat <- list(nepal.lw_w, nepal.lw_b,
+            tri.nb_w, tri.nb_b,
+            soi.nb_w, soi.nb_b,
+            relative.nb_w, relative.nb_b,
+            gabriel.nb_w, gabriel.nb_b,
+            knn.nb_1_w, knn.nb_1_b,
+            knn.nb_2_w, knn.nb_2_b,
+            knn.nb_3_w, knn.nb_3_b,
+            knn.nb_4_w, knn.nb_4_b)
+
+
+names(mat) <- c(paste0("phys_", c("W","B")),
+                paste0("tri_",  c("W","B")),
+                paste0("soi_",  c("W","B")),
+                paste0("rel_",  c("W","B")),
+                paste0("gab_",  c("W","B")),
+                paste0("knn1_", c("W","B")),
+                paste0("knn2_", c("W","B")),
+                paste0("knn3_", c("W","B")),
+                paste0("knn4_", c("W","B")))
+
+matrix_eval <- function(var, weights) {
+  
+  aux <- numeric(length(weights)) 
+  
+  for (i in seq_along(weights)) {
+    aux[i] <- moran.mc(var,
+                       weights[[i]], nsim = 9999,
+                       alternative = "two.sided")$p.value
+  }
+  
+  best_idx <- which.min(aux)
+  
+  list(
+    best_index  = best_idx,
+    best_weight = weights[[best_idx]],
+    best_name = names(weights)[which.min(aux)],
+    best_moran  = moran.mc(var, weights[[best_idx]], nsim = 9999,
+                           alternative = "two.sided"),
+    all_pvalues = aux
+  )
+}
+```
+
+Se ve cuál fue la matriz que mejor describe la correlación espacial de los datos.
+
+```{r}
+#| code-fold: show
+best.w <- matrix_eval(nepal.utm$ad_illit, mat)
+best.weights <- best.w$best_weight
+
+best.weights
+```
+
+Como se puede ver, esta corresponde a la obtenida considerando los cuatro vecinos más cercanos con el estilo `W`, es decir, con las filas estandarizadas. El mapa con esta matriz de conectividad se puede ver en la @fig-mapa_conectividad.
+
+```{r}
+#| label: fig-mapa_conectividad
+#| fig-cap: "Mapa de Nepal con la Mejor Estructura de Conectividad Espacial"
+nb_lines <- nb2lines(best.weights$neighbours, coords = coords, as_sf = TRUE)
+
+st_crs(nb_lines) <- st_crs(nepal.utm)
+
+ggplot() +
+  geom_sf(data = nepal.utm, fill = "grey95", color = "grey80", size = 0.2) +
+  # Conexiones
+  geom_sf(data = nb_lines, color = "#2c3e50", size = 0.3, alpha = 0.6) +
+  
+  # Centroides
+  geom_point(data = coords, aes(x = X, y = Y), 
+             color = "#e74c3c", size = 1, alpha = 0.8) +
+  
+  # Estética
+  theme_void() +
+  labs(title = "Estructura de Conectividad Espacial",
+       subtitle = paste0("Matriz de Pesos: ", best.w$best_name))
+
+```
+
+Se realizó el Test I de Moran mediante Monte Carlo con $n=9999$ permutaciones. La distribución empírica del índice de Moran puede observarse en la @fig-moran_mc.
+
+```{r}
+#| code-fold: false
+#| echo: false
+#| label: fig-moran_mc
+#| fig-cap: "Histograma de los valores simulados del índice de Moran. La línea cortada representa del valor del índice de Moran observado."
+moran.dist <- best.w$best_moran$res
+moran.obs <- best.w$best_moran$statistic
+
+hist(moran.dist,
+     col = "black",
+     border = "black",
+     density = 25,        # inclinación 
+     angle = 60,          # ángulo
+     xlab = expression(I),
+     ylab = "Frecuencia",
+     main = "",
+     xlim = range(c(moran.dist, moran.obs)))
+
+abline(v = moran.obs, 
+       col = "black", lty = "dashed", lwd = 2)
+```
+
+De esta forma, se evidencia que al 5\% de significancia se rechaza $H_0: I = \mathrm{E}[I]$. Es decir, hay suficiente evidencia para concluir que hay presencia de correlación espacial con respecto a la tasa de adultos analfabetas en Nepal.
+
+En la @fig-moran_plot se muestra el diagrama de Moran de la tasa de adultos analfabetas en Nepal.
+
+```{r}
+#| echo: false
+#| code-fold: false
+#| label: fig-moran_plot
+#| fig-cap: "Dispersograma de Moran para la tasa de adultos analfabetas en Nepal"
+moran.plot(x = nepal.utm$ad_illit, listw = best.weights, 
+           labels = as.character(nepal.utm$district),
+           xlab = "Tasa de Analfabetismo",
+           ylab = "Tasa de Analfabetismo Rezagada")
+
+legend("bottomright", 
+       legend=c(paste0("I de Moran:", round(moran.obs, 4)), 
+                paste0(expression(p), "-valor: ", round(best.w$best_moran$p.value, 4))), 
+       cex=1,
+       bg='lightgreen')
+```
+
+- Índice de Moran ($I = 0.595$):  
+  El valor del estadístico es positivo y sustancialmente mayor que cero, lo que indica la presencia de una autocorrelación espacial global positiva fuerte*. Esto sugiere que los distritos geográficamente cercanos tienden a presentar tasas de analfabetismo similares: áreas con niveles altos tienden a agruparse espacialmente, al igual que áreas con niveles bajos.  
+  Dado que el $p$-valor es prácticamente cero ($p < 0.001$), se rechaza la hipótesis nula de ausencia de autocorrelación espacial. En consecuencia, el patrón observado no es producto del azar, sino que refleja una estructura espacial estadísticamente significativa.
+
+- 2. Cuadrantes 
+
+El diagrama se divide en cuatro cuadrantes definidos por las medias de la tasa de analfabetismo (eje horizontal) y su rezago espacial (eje vertical). Cada cuadrante representa un tipo particular de asociación espacial:
+
+
+| Cuadrante | Patrón | Descripción | Ejemplos en la Figura | Implicación Geográfica |
+|-----------|--------|-------------|-----------------------|------------------------|
+| **Arriba–Derecha** | **Alto–Alto (H–H)** | Distritos con **tasas de analfabetismo altas** rodeados por vecinos con valores igualmente altos. | Casos en el extremo superior derecho. | **Hotspots** de analfabetismo. |
+| **Abajo–Izquierda** | **Bajo–Bajo (L–L)** | Distritos con **tasas de analfabetismo bajas** rodeados por vecinos con valores bajos. | **Lalitpur** y puntos cercanos al origen. | **Coldspots** de analfabetismo. |
+| **Arriba–Izquierda** | **Bajo–Alto (L–H)** | Distritos con tasas **bajas** rodeados por vecinos con tasas **altas**. | **Surkhet**. | **Outliers espaciales** (rompen el patrón regional). |
+| **Abajo–Derecha** | **Alto–Bajo (H–L)** | Distritos con tasas **altas** rodeados por vecinos con tasas **bajas**. | **Kapilbastu**. | **Outliers espaciales** con comportamiento diferenciado. |
+
+La pendiente positiva de la recta de regresión —equivalente al valor del Índice de Moran— y la concentración de observaciones en los cuadrantes **Alto–Alto** y Bajo–Bajo confirman que la tasa de analfabetismo adulto es un fenómeno espacialmente dependiente en Nepal. Este resultado sugiere que factores subyacentes al analfabetismo (por ejemplo, inversión en educación, pobreza estructural o condiciones socioculturales) no se distribuyen de manera aleatoria, sino que operan a escala regional y trascienden los límites administrativos distritales. En consecuencia, el diseño de políticas públicas orientadas a la reducción del analfabetismo debería adoptar un enfoque regional o interdistrital, concentrando esfuerzos en los hotspots identificados y analizando los outliers espaciales para comprender mecanismos locales y replicar experiencias exitosas.
+
+
+## Prueba de Autocorrelación Local
+
+Con el fin de identificar clusters y evaluar la similitud entre áreas y sus vecinos de forma local, se realiza el test I de Moran de forma locaL. En la @fig-localmoran se muestran dos mapas en los que se observa autocorrelación espacial significativa en los distritos de las zonas noroccidental, central y suroriental de Nepal. En estas zonas predominan relaciones tipo alto–alto y bajo–bajo, lo que indica que los distritos con altas tasas de analfabetismo en adultos tienden a estar rodeados por distritos con tasas igualmente altas, y de igual forma para las tasas bajas.
+
+```{r}
+lmoran <- localmoran(nepal.utm$ad_illit, 
+                     best.weights, 
+                     alternative = "two.sided")
+nepal.utm$lmp <- lmoran[, "Pr(z != E(Ii))"]
+```
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+#| label: fig-localmoran
+#| fig-cap: "Análisis de Autocorrelación Espacial Local para la tasa de analfabetismo."
+tmap_mode("view")
+
+lmp1 <- tm_shape(nepal.utm) +
+  tm_polygons("lmp", 
+              fill.scale = tm_scale_intervals(breaks = c(-Inf, 0.001, 0.01, 0.05, Inf), 
+                                              values = "brewer.purples"),
+              fill.legend = tm_legend(title = paste0(expression(p),"-valor"))) +
+  tm_title("") +
+  tm_layout(legend.position = c("left", "bottom"), frame = FALSE) +
+  tm_scalebar(position = c("right", "bottom"))
+
+mp <- moran.plot(as.vector(scale(nepal.utm$ad_illit)), best.weights, plot = FALSE)
+
+nepal.utm$quadrant <- NA
+# high-high
+nepal.utm[(mp$x >= 0 & mp$wx >= 0) & (nepal.utm$lmp <= 0.05), "quadrant"]<- 1
+# low-low
+nepal.utm[(mp$x <= 0 & mp$wx <= 0) & (nepal.utm$lmp <= 0.05), "quadrant"]<- 2
+# high-low
+nepal.utm[(mp$x >= 0 & mp$wx <= 0) & (nepal.utm$lmp <= 0.05), "quadrant"]<- 3
+# low-high
+nepal.utm[(mp$x <= 0 & mp$wx >= 0) & (nepal.utm$lmp <= 0.05), "quadrant"]<- 4
+# non-significant
+nepal.utm[(nepal.utm$lmp > 0.05), "quadrant"] <- 5
+
+
+lmp2 <- tm_shape(nepal.utm) +
+  tm_polygons(
+    "quadrant", 
+    fill.scale = tm_scale_intervals(
+    breaks = 1:6, 
+    values = "brewer.spectral",
+    labels = c("Alto-Alto", "Bajo-Bajo", 
+                "Alto-Bajo", "Bajo-Alto", 
+               "No significativo")),
+    fill.legend = tm_legend(title = ""),
+    fill_alpha = 0.5
+   ) +
+  tm_legend(text.size = 1)  +
+  tm_title("", frame = FALSE )  +
+  tm_layout(legend.outside = TRUE)
+
+tmap_arrange(lmp1, lmp2, ncol = 2, nrow = 1)
+```
+
+
+# Modelos de Regresión
+
+Se ajustan distintos modelos de regresión, teniendo en cuenta las variables descritas al inicio del documento.
+
+```{r}
+data <- as.data.frame(nepal.utm)
+
+data <- data %>% 
+  mutate(ag = AGDAMT / AGCAMT,
+         engy = log((ENGYCAMT + 1 )/ (ENGYDAMT + 1)),
+         gov = (GOVDAMT + 1) / (GOVCAMT + 1),
+         healt = HEALTDAMT / population,
+         mult = MULTDAMT / MULTCAMT,
+         soc = (SOCDAMT + 0.001) / (SOCCAMT + 0.001),
+         tot = TOTDAMT / population,
+         log.schlppop = log(schlppop))
+
+```
+
+
+## Modelo de Regresión MCO
+
+Primero, se muestra el modelo de regresión que tuvo un mejor ajuste con respecto al $R^2$ (0.4917) y la significancia de los coeficientes. Este modelo tiene la forma
+$$
+\mathbf{y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\varepsilon}, \qquad \boldsymbol{\varepsilon} \sim \mathrm{MVN}(\mathbf{0}, \sigma^2 \mathbf{I})
+$$
+
+```{r}
+#| code-fold: show
+form <- as.formula("ad_illit ~ pcinc + boyg1_5 + lif40 + soc + tot")
+
+fit.OLS <- lm(form,
+              data = data)
+```
+```{r}
+#| echo: false
+
+coef(summary(fit.OLS)) %>% 
+  kable(format = "html", digits = 4, align = 'c', escape = FALSE)
+```
+
+
+Además, se realiza el Test I de Moran con los residuales del modelo, rechazando la ausencia de autocorrelación espacial al 5\% de significancia. Es decir, los residuales presentan una dependencia espacial que no se pudo explicar con el modelo.
+
+```{r}
+lmmorantest <- lm.morantest(fit.OLS, listw = best.weights)
+t.lmmorantest <- tidy(lmmorantest)
+
+kable(t.lmmorantest[,c("statistic", "p.value", "method", "alternative")])
+```
+De esta forma, se hace necesario ajustar modelos de regresión espacial.
+
+## SAR - Spatial Autoregressive Model (Spatial Lag)
+
+El modelo SAR incorpora la interdependencia espacial de la variable espacial con el $\rho \in [-1,1]$. Este modelo tiene la estructura:
+$$
+\mathbf{y} = \rho \mathbf{W} \mathbf{y} +  \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\varepsilon}, \qquad \boldsymbol{\varepsilon} \sim \mathrm{MVN}(\mathbf{0}, \sigma^2 \mathbf{I})
+$$
+
+```{r}
+#| code-fold: show
+fit.SAR <- lagsarlm(form,
+                    data = data, listw = best.weights)
+```
+
+
+## SEM - Spatial Error Model 
+
+Para el modelo SEM se tiene la estructura
+$$
+\begin{aligned}
+\mathbf{y} =& \mathbf{X} \boldsymbol{\beta} + \mathbf{u},
+\\
+\mathbf{u} =& \lambda \mathbf{W} \mathbf{u} + \boldsymbol{\varepsilon}, \qquad
+\boldsymbol{\varepsilon} 
+\sim \mathrm{MVN}(\mathbf{0}, \sigma^2 \mathbf{I})
+\end{aligned}
+$$
+y este asume que hay factores no observados que generan la dependencia espacial. Es decir, la dependencia se incorpora en los errores.
+
+```{r}
+#| code-fold: show
+fit.SEM <- errorsarlm(form,
+                      data = data, listw = best.weights)
+```
+
+## SDM - Spatial Durbin Model
+
+El modelo de Durbin integra tanto interdependencia espacial de la respuesta como efectos espaciales de las covariables.
+$$
+\mathbf{y} = \rho \mathbf{W} \mathbf{y} +  \mathbf{X} \boldsymbol{\beta} + \gamma \mathbf{W} \mathbf{X}  + \boldsymbol{\varepsilon} , \qquad \boldsymbol{\varepsilon} \sim \mathrm{MVN}(\mathbf{0}, \sigma^2 \mathbf{I})
+$$
+
+```{r}
+#| code-fold: show
+fit.Durbin <- lagsarlm(form,
+                       data = data, listw = best.weights, type = "mixed")
+```
+
+
+## SLX - Spatially Lagged X Model 
+
+En el modelo SLX se tienen en cuenta las relaciones entre las covariables de los vecinos.
+$$
+\mathbf{y} = \mathbf{X} \boldsymbol{\beta} + \gamma \mathbf{W} \mathbf{X}  + \boldsymbol{\varepsilon} , \qquad \boldsymbol{\varepsilon} \sim \mathrm{MVN}(\mathbf{0}, \sigma^2 \mathbf{I})
+$$
+
+```{r}
+#| code-fold: show
+fit.D_lagX <- lmSLX(form,
+                    data = data, listw = best.weights)
+```
+
+
+## SDEM - Spatial Durbin Error Model
+
+El modelo SDEM combina los modelos SEM y SLX. Este tiene la siguiente estructura
+$$
+\begin{aligned}
+\mathbf{y} =& \mathbf{X} \boldsymbol{\beta} + \lambda \mathbf{W} \mathbf{X}  + \mathbf{u}\\
+\mathbf{u} =& \gamma\mathbf{W} \mathbf{u} + \boldsymbol{\varepsilon}, \qquad \boldsymbol{\varepsilon} \sim \mathrm{MVN}(\mathbf{0}, \sigma^2 \mathbf{I})
+\end{aligned}
+$$
+
+```{r}
+#| code-fold: show
+fit.SDEM <- errorsarlm(form,
+                       data = data, listw = best.weights, etype = "emixed")
+```
+
+
+
+## Manski Model
+
+Es un modelo complejo de la forma
+$$
+\begin{aligned}
+\mathbf{y} =& \rho \mathbf{W} \mathbf{y} +  \mathbf{X} \boldsymbol{\beta} + \mathbf{W} \mathbf{X} \theta  + \mathbf{u}, \\
+\mathbf{u} =& \lambda \mathbf{W} \mathbf{u} + \boldsymbol{\varepsilon}, 
+\qquad \boldsymbol{\varepsilon} \sim \mathrm{MVN}(\mathbf{0}, \sigma^2 \mathbf{I})
+\end{aligned}
+$$
+
+```{r}
+#| code-fold: show
+
+fit.Manski <- sacsarlm(form,
+                       data = data, listw = best.weights, type="sacmixed")
+```
+
+
+## SAC (SARAR)- Combined Spatial Autocorrelation Model
+
+Por último, se tiene una combinación de modelos SAR y SEM. Es decir, se asume interdependencia espacial de la variable dependiente y  factores no observados.
+$$
+\begin{aligned}
+\mathbf{y} =& \rho \mathbf{W} \mathbf{y} +  \mathbf{X} \boldsymbol{\beta} + \mathbf{u} \\ \mathbf{u} =& \lambda \mathbf{W} \mathbf{u}+ \boldsymbol{\varepsilon}, \qquad \boldsymbol{\varepsilon} \sim \mathrm{MVN}(\mathbf{0}, \sigma^2 \mathbf{I})
+\end{aligned}
+$$
+
+
+```{r}
+#| code-fold: show
+fit.SARAR <- sacsarlm(form,
+                      data = data, listw = best.weights, type="sac")
+```
+
+
+## Selección del Modelo
+
+Para realizar la selección del mejor modelo, se recurre a comparar los AIC.
+
+```{r}
+#| echo: false
+#| code-fold: false
+#| label: tbl-AIC
+#| tbl-cap: "Comparación del AIC de los modelos ajustados" 
+AICs <- AIC(fit.OLS, fit.SAR, fit.SEM, fit.Durbin, 
+            fit.D_lagX, fit.SDEM, fit.SARAR) 
+
+arrange(AICs, AIC) %>% 
+  kable(format = "html", digits = 4, col.names = c("Modelo", "gl", "AIC"))
+
+```
+
+En la @tbl-AIC se puede observar que el modelo con un menor AIC corresponde al **SARAR**.
+
+## Interpretación
+
+Debido a que el modelo SAC/SARAR fue el de menor AIC, se muestra su resúmen. Primero, se puede ver que no todas las variables son  significativas, a diferencia del modelo de regresión ajustado por mínimos cuadrados ordinarios. 
+
+```{r}
+coef(summary(fit.SARAR)) %>% 
+  kable(format = "html", digits = 4, align = 'c', escape = FALSE)
+```
+
+Por otro lado, se presentan las estimaciones los parámetros $\rho$ y $\lambda$.
+
+```{r}
+params.sac <- data.frame(Parámetro = c("$\\rho$", "$\\lambda$"),
+                         Estimación = c(fit.SARAR$rho, fit.SARAR$lambda),
+                         SE = c(fit.SARAR$rho.se, fit.SARAR$lambda.se))
+
+params.sac %>% 
+  kable(format = "pandoc", digits = 4, align = 'c', row.names = FALSE)
+```
+
+De esta forma, con $\hat{\rho}=0.468$ se confirma que hay dependencia espacial con respecto a la tasa de adultos analfabetas en Nepal. Más concretamente, un distrito puede afectar ``positivamente'' al valor de sus vecinos, justo como se veía en la @fig-localmoran. Por otro lado, $\hat{\lambda} = 0.568$ indica que hay factores no incluídos en el modelo que presentan dependencia espacial. En este caso, ambas estimaciones son significativas al 5\%. 
+
+Por lo tanto, se podría ver que a medida que los ingresos per cápita aumentan en un distrito, su tasa de analfabetismo disminuye. Por otro lado, si en un distrito el porcentaje de personas que no sobreviven hasta los 40 años aumenta, se espera que la tasa de analfabetismo aumente también.
+
+## Validación
+
+### Correlación Espacial
+
+La primera evaluación que se realiza corresponde a ver si los residuales del mejor modelo ajustado siguen presentando autocorrelación espacial o no. Para esto, se realiza el Test I de Moran, concluyendo que, a una significancia del 5\%, no se rechaza la hipótesis de ausencia de autocorrelación espacial de los residuales. 
+
+```{r}
+data$residuals <- resid(fit.SARAR)
+
+moran.sac <- moran.test(data$residuals, listw = best.weights, alternative = "two.sided")
+kable(tidy(moran.sac)[,c("statistic", "p.value", "method", "alternative")])
+
+```
+
+
+### Homoscedasticidad
+
+El siguiente supuesto que se prueba es el de varianza homogénea. Primero, en la @fig-homoscedasticidad se puede ver que los residuales no tienen ningún comportamiento que indique heterogeneidad de la varianza.
+
+```{r}
+#| echo: false
+#| code-fold: false
+#| label: fig-homoscedasticidad
+#| fig-cap: "Residuales vs Valores Ajustados para el modelo SARAR"
+#| message: false
+#| warning: false
+
+scatter.smooth(resid(fit.SARAR) ~ fitted(fit.SARAR), 
+               xlab = "Valores Ajustados", ylab = "Residuales")
+
+
+```
+
+Además, se usa el test de Breusch-Pagan para juzgar $H_0: \text{la varianza es homogénea}$.
+
+```{r}
+
+bp.sac <- bptest.Sarlm(fit.SARAR)
+kable(tidy(bp.sac)[,c("statistic", "p.value", "method")])
+
+```
+
+Así, al 5\% de significancia no se rechaza la hipótesis nula de homoscedasticidad.
+
+### Normalidad
+
+En la @fig-normalidad se puede ver que los residuales tienden a estar cerca de la línea teórica, indicando un ajuste bueno.
+
+```{r}
+#| echo: false
+#| code-fold: false
+#| label: fig-normalidad
+#| fig-cap: "QQ-plot de los residuales del modelo SARAR"
+#| message: false
+#| warning: false
+
+qqnorm(data$residuals, 
+       xlab = "Cuantiles Teóricos",
+       ylab = "Cuantiles Muestrales", 
+       main = "QQ-plot de los residuales")
+qqline(data$residuals)
+
+```
+
+Para corroborar esto, se realiza el test de Anderson--Darling, concluyendo que no se rechaza la hipótesis de normalidad de los residuales al 5\% de significancia.
+```{r}
+ad.sarar <- ad.test(data$residuals)
+kable(tidy(ad.sarar))
+```
+
+
+## Estimación
+
+A continuación, en la @fig-fittedvalues se presentan las estimaciones de la tasa de analfabetismo en adultos en Nepal.
+
+```{r}
+nepal.utm$fitted <- fitted(fit.SARAR)
+nepal.utm$residuals <- resid(fit.SARAR)
+```
+
+
+```{r}
+#| label: fig-fittedvalues
+#| fig-cap: "Mapa de predicciones de la tasa de analfabetismo en Nepal por distrito"
+#| echo: false
+#| code-fold: false
+
+tmap_mode("view")
+
+tm_shape(nepal.utm) +
+  tm_polygons("fitted",
+              fill.scale = tm_scale_intervals(n = 5, 
+                                              style = "quantile", 
+                                              values = "brewer.reds"),
+              fill.legend = tm_legend(title = "Tasa de\nAnalfabetismo")) +
+  tm_title("") +
+  tm_layout(legend.position = c("left", "bottom"), frame = FALSE) +
+  tm_scalebar(position = c("right", "bottom")) +
+  tm_compass(position = c("right", "top"))
+
+```
+
+
+## Otros Modelos 
+
+Se decide comparar los resultados con otros modelos que no incorporan parámetros de asociación espacial como se vió en la sección anterior.
+
+## Moran Eigenvalues 
+
+Para realizar el uso de los vectores propios de la matriz $\mathbf{M}\mathbf{W}\mathbf{M}$, con $\mathbf{M} = \mathbf{I} - \mathbf{X}(\mathbf{X}^t\mathbf{X})^{-1}\mathbf{X}^t$, se usa la función `SpatialFiltering()` que toma el subconjunto de vectores propios que reducen la correlación espacial de los residuales en el modelo de regresión MCO.
+
+```{r}
+#| code-fold: show
+SF <- SpatialFiltering(form, data = data, nb = best.weights$neighbours, 
+                       style = "W", verbose = FALSE, ExactEV = TRUE)
+
+fit.SF <- lm(ad_illit ~ pcinc + boyg1_5 + lif40 + soc + tot + fitted(SF),
+             data = data)
+
+
+```
+
+Por lo tanto, también se presenta el resumen de este modelo, que además tiene un $R^2=0.8076$.
+
+```{r}
+#| echo: false
+#| code-fold: false
+coef(summary(fit.SF)) %>% 
+  kable(format = "html", digits = 4, align = 'c', escape = FALSE)
+```
+
+
+::: panel-tabset
+
+### Correlación
+
+```{r}
+SF.moran <- lm.morantest(fit.SF, best.weights, alternative = "two.sided")
+t.SFmoran <- tidy(SF.moran)
+
+kable(t.SFmoran[,c("statistic", "p.value", "method", "alternative")])
+
+```
+
+
+### Homoscedasticidad
+
+```{r}
+#| code-fold: true
+#| warning: false
+
+nepal.utm$residuals.SF <- resid(fit.SF)
+
+SF.bptest <- bptest(fit.SF)
+
+scatter.smooth(resid(fit.SF) ~ fitted(fit.SF),
+               xlab = "Valores Ajustados", ylab = "Residuales")
+legend("bottomright", 
+       legend=c(paste0("Breusch-Pagan:", round(SF.bptest$statistic, 4)), 
+                paste0(expression(p), "-valor: ", round(SF.bptest$p.value, 4))),
+       cex=1,
+       bg='salmon')
+
+```
+
+### Normalidad
+
+```{r}
+#| code-fold: true
+#| warning: false
+
+
+SF.normal <- ad.test(resid(fit.SF))
+
+qqnorm(resid(fit.SF),
+       xlab = "Cuantiles Teóricos",
+       ylab = "Cuantiles Muestrales", 
+       main = "QQ-plot de los residuales")
+qqline(resid(fit.SF))
+
+legend("bottomright", 
+       legend=c(paste0("Anderson-Darling:", round(SF.normal$statistic, 4)), 
+                paste0(expression(p), "-valor: ", round(SF.normal$p.value, 4))),
+       cex=1,
+       bg='salmon')
+
+```
+:::
+
+De esta forma, es posible ver que, por ejemplo, los residuales ya no presentan correlación espacial y el supuesto de normalidad se cumple. Lo único que no se cumple es la homoscedasticidad.
+
+## GAM
+
+Otra opción es usar los modelos GAM. Una ventaja de ellos, es que permite modelar covariables que no tengan una relación lineal con la variable respuesta. La forma de incluir la correlación espacial es mediante las coordenadas: `s(X, Y)`, como se muestra en @bivand2008asdar.
+```{r}
+#| code-fold: show
+library(mgcv)
+
+data <- cbind(data, coords)
+
+fit.gam <- gam(ad_illit ~ s(pcinc, bs = "cr") + boyg1_5
+                          + s(lif40, bs = "cr") + s(soc, bs = "cr")
+                          + s(tot, bs = "cr") + s(X, Y), data = data)
+
+```
+
+La única forma de interpretar los suavizamientos es con los efectos parciales de las covariables sobre la variable respueta. De la misma forma, se presenta su diagnóstivco.
+
+```{r}
+#| echo: false
+#| layout-ncol: 2
+#| fig-width: 5
+#| fig-height: 4.5
+#| fig-cap: "Efectos parciales sobre la tasa de analfabetismo"
+#| fig-subcap: 
+#|   - "Efecto parcial de pcinc"
+#|   - "Efecto parcial de lif40"
+#|   - "Efecto parcial de soc"
+#|   - "Efecto parcial de tot"
+#|   - "Efecto espacial estimado"   
+#| label: fig-2_linearcheck
+
+plot.gam(fit.gam)
+
+```
+
+
+
+::: panel-tabset
+
+### Correlación
+
+```{r}
+nepal.utm$residuals.gam <- resid(fit.gam)
+
+gam.moran <-  moran.test(nepal.utm$residuals.gam, best.weights, alternative =  "two.sided")
+
+tgam.moran <- tidy(gam.moran)
+
+kable(tgam.moran[,c("statistic", "p.value", "method", "alternative")])
+
+```
+
+
+### Homoscedasticidad
+
+```{r}
+#| code-fold: true
+#| warning: false
+
+gam.bptest <- bptest(fit.gam)
+
+scatter.smooth(resid(fit.gam) ~ fitted(fit.gam),
+               xlab = "Valores Ajustados", ylab = "Residuales")
+legend("bottomright", 
+       legend=c(paste0("Breusch-Pagan:", round(gam.bptest$statistic, 4)), 
+                paste0(expression(p), "-valor: ", round(gam.bptest$p.value, 4))),
+       cex=1,
+       bg='salmon')
+
+```
+
+### Normalidad
+
+```{r}
+#| code-fold: true
+#| warning: false
+
+
+gam.normal <- ad.test(resid(fit.gam))
+
+qqnorm(resid(fit.gam),
+       xlab = "Cuantiles Teóricos",
+       ylab = "Cuantiles Muestrales", 
+       main = "QQ-plot de los residuales")
+qqline(resid(fit.gam))
+
+legend("bottomright", 
+       legend=c(paste0("Anderson-Darling:", round(gam.normal$statistic, 4)), 
+                paste0(expression(p), "-valor: ", round(gam.normal$p.value, 4))),
+       cex=1,
+       bg='salmon')
+
+```
+:::
+
+El supuesto de no correlación espacial de los residuales se rechaza con una significancia del 5\%. Con la introducción de las coordenadas no se alcanza a elimianar la dependencia espacial de los residuales.
+
+
+## Comparación Predicciones
+
+Se presentan las predicciones para los tres modelos ajustados en la @fig-fitted_comp.
+
+
+```{r}
+nepal.utm$fitted.SF <- fitted(fit.SF)
+nepal.utm$fitted.gam <- fitted(fit.gam)
+```
+
+
+```{r}
+#| label: fig-fitted_comp
+#| fig-cap: "Comparación de las de predicciones de la tasa de analfabetismo en Nepal por distrito"
+#| echo: false
+#| code-fold: false
+
+tmap_mode("view")
+
+pred1 <- tm_shape(nepal.utm) +
+  tm_polygons("fitted",
+              fill.scale = tm_scale_intervals(n = 5, 
+                                              style = "quantile", 
+                                              values = "brewer.reds"),
+              fill.legend = tm_legend(title = "Tasa de\nAnalfabetismo")) +
+  tm_title("SAC/SARAR") +
+  tm_layout(legend.position = c("left", "bottom"), frame = FALSE) +
+  tm_scalebar(position = c("right", "bottom")) +
+  tm_compass(position = c("right", "top"))
+
+pred2 <- tm_shape(nepal.utm) +
+  tm_polygons("fitted.SF",
+              fill.scale = tm_scale_intervals(n = 5, 
+                                              style = "quantile", 
+                                              values = "brewer.reds"),
+              fill.legend = tm_legend(title = "Tasa de\nAnalfabetismo")) +
+  tm_title("Moran Eigenvectors") +
+  tm_layout(legend.position = c("left", "bottom"), frame = FALSE) +
+  tm_scalebar(position = c("right", "bottom")) +
+  tm_compass(position = c("right", "top"))
+
+pred3 <- tm_shape(nepal.utm) +
+  tm_polygons("fitted.gam",
+              fill.scale = tm_scale_intervals(n = 5, 
+                                              style = "quantile", 
+                                              values = "brewer.reds"),
+              fill.legend = tm_legend(title = "Tasa de\nAnalfabetismo")) +
+  tm_title("GAM") +
+  tm_layout(legend.position = c("left", "bottom"), frame = FALSE) +
+  tm_scalebar(position = c("right", "bottom")) +
+  tm_compass(position = c("right", "top"))
+
+
+obsp <- tm_shape(nepal.utm) +
+  tm_polygons("ad_illit",
+              fill.scale = tm_scale_intervals(n = 5, 
+                                              style = "quantile", 
+                                              values = "brewer.reds"),
+              fill.legend = tm_legend(title = "Tasa de\nAnalfabetismo")) +
+  tm_title("Observado") +
+  tm_layout(legend.position = c("left", "bottom"), frame = FALSE) +
+  tm_scalebar(position = c("right", "bottom")) +
+  tm_compass(position = c("right", "top"))
+
+
+tmap_arrange(pred1, pred2, pred3, obsp, ncol = 2, nrow = 2)
+```
+
+
+## References

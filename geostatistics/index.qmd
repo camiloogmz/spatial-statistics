@@ -1,0 +1,11 @@
+---
+title: "Geostatistics"
+---
+
+Welcome to the geostatistics section. Here you will find the analysis of temperature and ozone in Texas, US, using different approaches such as spatial, spatio-temporal and functional kriging.
+
+## Topics
+
+- [Temperature](temp.qmd)
+- [Spatio-temporal models](spacetime.qmd)
+- [Functional data](fd.qmd)

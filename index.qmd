@@ -2,10 +2,13 @@
 title: "spatial-statistics"
 ---
 
-This is a Quarto website.
+Welcome!
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+On this website, you will find the projects I developed for the *Spatial Statistics* course at the National University of Colombia. These projects mainly focus on the geostatistical analysis of weather conditions in Texas (USA) using several approaches, as well as the analysis of areal data from Nepal. All analyses were conducted using `R`.
 
-```{r}
-1 + 1
-```
+## Website structure
+
+The content of this website is organized into the following sections:
+  
+- [Geostatistics](geostatistics/index.qmd)
+- [Areal Data](arealdata/datos_area.qmd)

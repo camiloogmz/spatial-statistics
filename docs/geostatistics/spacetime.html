@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Espacio Tiempo – spatial-statistics</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-e31584831b205ffbb2d98406f31c2a5b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">spatial-statistics</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-geostatistics" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Geostatistics</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-geostatistics">    
+        <li>
+    <a class="dropdown-item" href="../geostatistics/index.html">
+ <span class="dropdown-text">Overview</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../geostatistics/temp.html">
+ <span class="dropdown-text">Temperature</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../geostatistics/ozone.html">
+ <span class="dropdown-text">Ozone</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../geostatistics/spacetime.html">
+ <span class="dropdown-text">Spatio-temporal</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../geostatistics/fd.html">
+ <span class="dropdown-text">Functional data</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#análisis-descriptivo" id="toc-análisis-descriptivo" class="nav-link active" data-scroll-target="#análisis-descriptivo">Análisis Descriptivo</a>
+  <ul class="collapse">
+  <li><a href="#estacionariedad" id="toc-estacionariedad" class="nav-link" data-scroll-target="#estacionariedad">Estacionariedad</a></li>
+  <li><a href="#semivariograma" id="toc-semivariograma" class="nav-link" data-scroll-target="#semivariograma">Semivariograma</a></li>
+  <li><a href="#kriging-espacio-tiempo" id="toc-kriging-espacio-tiempo" class="nav-link" data-scroll-target="#kriging-espacio-tiempo">Kriging Espacio Tiempo</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Espacio Tiempo</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>En este apartado se trabajará con los 8 días anteiores al 15 de abril de 2024.</p>
+<section id="análisis-descriptivo" class="level2">
+<h2 class="anchored" data-anchor-id="análisis-descriptivo">Análisis Descriptivo</h2>
+<p>Primero realizamos la carga de los datos y las estaciones. Los datos se encuentran organizados de la siguiente forma:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Stations <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"temp_stations_NA.csv"</span>, <span class="at">check.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>Stations <span class="ot">&lt;-</span> Stations <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">AQSID =</span> <span class="fu">as.character</span>(AQSID))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>Temp_st_pvt <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"Temp_data_imputed.csv"</span>, <span class="at">check.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>Temp_st <span class="ot">&lt;-</span> Temp_st_pvt <span class="sc">%&gt;%</span> </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="sc">-</span>Valid.Date,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"AQSID"</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"Temp"</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Valid.Date =</span> <span class="fu">as.Date</span>(Valid.Date, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">Day =</span> <span class="fu">yday</span>(Valid.Date), </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">AQSID =</span> <span class="fu">as.character</span>(AQSID)) </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>Temp.st <span class="ot">&lt;-</span> Temp_st <span class="sc">%&gt;%</span> </span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Day <span class="sc">%in%</span> <span class="fu">seq</span>(<span class="dv">90</span>, <span class="dv">97</span>, <span class="dv">1</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(Stations, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"AQSID"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(Valid.Date, AQSID, Temp, Day, X, Y) </span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>dataTemp.ST <span class="ot">&lt;-</span> Temp.st <span class="sc">%&gt;%</span> </span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(AQSID, Valid.Date) <span class="sc">%&gt;%</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(Temp)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>time.index <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">unique</span>(Temp.st<span class="sc">$</span>Valid.Date))</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>Temp.stations.sp <span class="ot">&lt;-</span> Stations <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(AQSID)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>Temp.stations.sp <span class="ot">&lt;-</span> <span class="fu">SpatialPoints</span>(Temp.stations.sp[,<span class="fu">c</span>(<span class="st">"X"</span>, <span class="st">"Y"</span>)])</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>TEMP.ST <span class="ot">&lt;-</span> <span class="fu">STFDF</span>(Temp.stations.sp, time.index, dataTemp.ST)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Datos Espacio Temporales de Temperatura</caption>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Valid.Date</th>
+<th style="text-align: center;">AQSID</th>
+<th style="text-align: center;">Temp</th>
+<th style="text-align: center;">Day</th>
+<th style="text-align: center;">X</th>
+<th style="text-align: center;">Y</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">2024-03-30</td>
+<td style="text-align: center;">480271045</td>
+<td style="text-align: center;">24.0</td>
+<td style="text-align: center;">90</td>
+<td style="text-align: center;">1744479</td>
+<td style="text-align: center;">7447518</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2024-03-30</td>
+<td style="text-align: center;">480271047</td>
+<td style="text-align: center;">23.5</td>
+<td style="text-align: center;">90</td>
+<td style="text-align: center;">1720906</td>
+<td style="text-align: center;">7443160</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2024-03-30</td>
+<td style="text-align: center;">480290032</td>
+<td style="text-align: center;">24.1</td>
+<td style="text-align: center;">90</td>
+<td style="text-align: center;">1633570</td>
+<td style="text-align: center;">7266958</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2024-03-30</td>
+<td style="text-align: center;">480290052</td>
+<td style="text-align: center;">23.1</td>
+<td style="text-align: center;">90</td>
+<td style="text-align: center;">1638725</td>
+<td style="text-align: center;">7280038</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2024-03-30</td>
+<td style="text-align: center;">480290055</td>
+<td style="text-align: center;">23.7</td>
+<td style="text-align: center;">90</td>
+<td style="text-align: center;">1652022</td>
+<td style="text-align: center;">7255235</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2024-03-30</td>
+<td style="text-align: center;">480290059</td>
+<td style="text-align: center;">24.2</td>
+<td style="text-align: center;">90</td>
+<td style="text-align: center;">1663815</td>
+<td style="text-align: center;">7240764</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2024-03-30</td>
+<td style="text-align: center;">480290501</td>
+<td style="text-align: center;">24.8</td>
+<td style="text-align: center;">90</td>
+<td style="text-align: center;">1623771</td>
+<td style="text-align: center;">7240383</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2024-03-30</td>
+<td style="text-align: center;">480290502</td>
+<td style="text-align: center;">22.2</td>
+<td style="text-align: center;">90</td>
+<td style="text-align: center;">1632732</td>
+<td style="text-align: center;">7290822</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2024-03-30</td>
+<td style="text-align: center;">480290622</td>
+<td style="text-align: center;">24.6</td>
+<td style="text-align: center;">90</td>
+<td style="text-align: center;">1661634</td>
+<td style="text-align: center;">7249348</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2024-03-30</td>
+<td style="text-align: center;">480290677</td>
+<td style="text-align: center;">24.1</td>
+<td style="text-align: center;">90</td>
+<td style="text-align: center;">1637522</td>
+<td style="text-align: center;">7256897</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Y, para estos ocho días, se tienen las siguientes observaciones.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stplot</span>(TEMP.ST, <span class="at">main =</span> <span class="st">"Temperatura en ocho días consecutivos"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="spacetime_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="estacionariedad" class="level3">
+<h3 class="anchored" data-anchor-id="estacionariedad">Estacionariedad</h3>
+<p>Se analiza la estacionariedad de la media en estas ocho estaciones. Inicialmente, la temperatura presentaba tendencia espacial, por lo que se ajustó un modelo general que pudiese servir para todos los tiempos.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="spacetime_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="spacetime_files/figure-html/unnamed-chunk-5-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>De esta forma se puede presenciar una estacionariedad general en los distintos tiempos que se están analizando.</p>
+<p>Además, se presentan el mapa de calor y las series por estación. En el primero, podemos ver que en el eje X se presentan algunas de las estaciones, el eje Y representa las fechas consideradas y el color indicaría la temperatura. En el segundo gráfico podemos ver que las series no presentan tendencia marcada, indicando además un comportamiento similar de la temperatura en estas veinte estaciones.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Primera Gráfica</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Segunda Gráfica</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>IDs <span class="ot">&lt;-</span> <span class="fu">unique</span>(Stations<span class="sc">$</span>AQSID)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>sel <span class="ot">&lt;-</span> <span class="cn">NULL</span>; <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>) sel<span class="ot">&lt;-</span><span class="fu">c</span>(sel,<span class="fu">which</span>(IDs<span class="sc">==</span>IDs[i]))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">stplot</span>(TEMP.ST[sel, <span class="st">"2024-03-31::2024-04-14"</span>, <span class="st">"Temp"</span>], <span class="at">mode=</span><span class="st">"xt"</span>, <span class="at">scaleX=</span><span class="dv">0</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">col.regions=</span><span class="fu">terrain.colors</span>(<span class="dv">100</span>), <span class="at">main =</span> <span class="st">"Temperatura"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="spacetime_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stplot</span>(TEMP.ST[sel, <span class="st">"2024-03-31::2024-04-14"</span>, <span class="st">"Temp"</span>], <span class="at">mode=</span><span class="st">"ts"</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>       <span class="at">main =</span> <span class="st">"Temperatura"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="spacetime_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="semivariograma" class="level3">
+<h3 class="anchored" data-anchor-id="semivariograma">Semivariograma</h3>
+<p>A continuación se presenta el semivariograma empírico obtenido con la librería <code>GeoModels</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coordinates</span>(Temp.st) <span class="ot">&lt;-</span> <span class="er">~</span> X <span class="sc">+</span> Y</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>maxdist <span class="ot">&lt;-</span> <span class="fu">max</span>(<span class="fu">dist</span>(<span class="fu">coordinates</span>(Temp.st)))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>Temp.st.res <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(Temp.st) <span class="sc">%&gt;%</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Day) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Temp =</span> <span class="fu">resid</span>(<span class="fu">lm</span>(Temp <span class="sc">~</span> X <span class="sc">+</span> Y <span class="sc">+</span> <span class="fu">I</span>(X<span class="sc">^</span><span class="dv">2</span>)))) <span class="sc">%&gt;%</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="co"># se trabaja con los residuales</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>geoMatrix <span class="ot">&lt;-</span> Temp.st.res <span class="sc">%&gt;%</span> <span class="co"># los datos se necesitan como matriz</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Day, AQSID) <span class="sc">%&gt;%</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Day, AQSID, Temp) <span class="sc">%&gt;%</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> AQSID, <span class="at">values_from =</span> Temp) <span class="sc">%&gt;%</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Day) <span class="sc">%&gt;%</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>Day) <span class="sc">%&gt;%</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>()</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>geovgm <span class="ot">&lt;-</span> <span class="fu">GeoVariogram</span>(<span class="at">data =</span> geoMatrix, </span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>                       <span class="at">coordx =</span> Stations[,<span class="fu">c</span>(<span class="st">"X"</span>, <span class="st">"Y"</span>)],</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>                       <span class="at">coordt =</span> <span class="fu">unique</span>(Temp.st<span class="sc">$</span>Day <span class="sc">-</span> <span class="fu">min</span>(Temp.st<span class="sc">$</span>Day)),</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>                       <span class="at">distance =</span> <span class="st">"Eucl"</span>, </span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>                       <span class="at">type=</span> <span class="st">"variogram"</span>, </span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>                       <span class="at">maxdist =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">3</span><span class="sc">*</span>maxdist)</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(geovgm)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="spacetime_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Se puede ver que, en el semivariograma temporal existe una estructura de dependencia. De igual forma, espacialmente se puede presenciar un nugget pequeño y la posible silla alrededor de 2.</p>
+<section id="estimación-teórica-del-semivariograma" class="level4">
+<h4 class="anchored" data-anchor-id="estimación-teórica-del-semivariograma">Estimación Teórica del Semivariograma</h4>
+<p>Para llevar a cabo la estimación, se usó la función <code>GeoFit</code> de <strong>GeoModels</strong>. En la ayuda de esta función se especifican distintos modelos espacio tiempo separables y no separables. Se realizó el ajuste de varios de ellos, tomando como valores iniciales de escala los que se podían visualizar de los semivariogramas marginales.</p>
+<section id="modelos-no-separables" class="level5">
+<h5 class="anchored" data-anchor-id="modelos-no-separables">Modelos No Separables</h5>
+<p>A pesar de que se ajustaron siete modelos no separables, el algoritmo de todos ellos no convergió muy seguramente. Solo convergieron de forma segura los modelos Gneiting y Mátern Mátern.</p>
+<p>A continuación se presenta la estimación.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>mean_est <span class="ot">&lt;-</span> <span class="dv">0</span>; var_est <span class="ot">&lt;-</span> <span class="fu">var</span>(<span class="fu">as.numeric</span>(geoMatrix))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="do">##### Gneiting ----</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">CorrParam</span>(<span class="st">"Gneiting"</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>init.ST_gne <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power_s =</span> <span class="dv">2</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>                    <span class="at">power_t =</span> <span class="fl">0.8</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                    <span class="at">scale_s =</span> <span class="fl">2e5</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>                    <span class="at">scale_t =</span> <span class="dv">3</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sep =</span> <span class="fl">0.5</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sill =</span> var_est,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>                    <span class="at">nugget =</span> <span class="fl">0.1</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>fixed.ST_gne <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="fu">GeoCovmatrix</span>(<span class="at">corrmodel =</span> <span class="st">"Gneiting"</span>, </span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>             <span class="at">coordx =</span> Stations[,<span class="fu">c</span>(<span class="st">"X"</span>, <span class="st">"Y"</span>)],</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>             <span class="at">coordt =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>             <span class="at">model =</span> <span class="st">"Gaussian"</span>,</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>             <span class="at">param =</span> init.ST_gne)</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>lwr <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power_s =</span> <span class="fl">1e-4</span>,</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>            <span class="at">power_t =</span> <span class="fl">1e-4</span>,</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>            <span class="at">scale_s =</span> <span class="dv">0</span>,</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>            <span class="at">scale_t =</span> <span class="dv">0</span>,</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>            <span class="at">sep =</span> <span class="dv">0</span>,</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>            <span class="at">sill =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>,</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>            <span class="at">nugget =</span> <span class="dv">0</span>)</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>upr <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power_s =</span> <span class="dv">2</span>,</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>            <span class="at">power_t =</span> <span class="dv">2</span>,</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>            <span class="at">scale_s =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>            <span class="at">scale_t =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>            <span class="at">sep =</span> <span class="dv">1</span>,</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>            <span class="at">sill =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>            <span class="at">nugget =</span> <span class="dv">1</span>)</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>geofit_gne <span class="ot">&lt;-</span> <span class="fu">GeoFit</span>(<span class="at">data =</span> geoMatrix, </span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>                     <span class="at">coordx =</span> Stations[,<span class="fu">c</span>(<span class="st">"X"</span>, <span class="st">"Y"</span>)],</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>                     <span class="at">coordt =</span> <span class="fu">unique</span>(Temp.st<span class="sc">$</span>Day <span class="sc">-</span> <span class="fu">min</span>(Temp.st<span class="sc">$</span>Day)),</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>                     <span class="at">distance =</span> <span class="st">"Eucl"</span>, </span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>                     <span class="at">maxtime =</span> <span class="dv">4</span>, <span class="at">maxdist =</span> maxdist<span class="sc">/</span><span class="dv">3</span>,</span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>                     <span class="at">model =</span> <span class="st">"Gaussian"</span>, </span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>                     <span class="at">corrmodel =</span> <span class="st">"Gneiting"</span>, </span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>                     <span class="at">start =</span> init.ST_gne, </span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>                     <span class="at">fixed =</span> fixed.ST_gne,</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>                     <span class="at">optimizer =</span> <span class="st">"L-BFGS-B"</span>,</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>                     <span class="at">lower =</span> lwr,</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>                     <span class="at">upper =</span> upr)</span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>geofit_gne<span class="sc">$</span>logCompLik <span class="co">#-1376261</span></span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>geocgvm_gne <span class="ot">&lt;-</span> <span class="fu">GeoCovariogram</span>(<span class="at">fitted =</span> geofit_gne, </span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>                              <span class="at">answer.vario =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>                              <span class="at">show.vario =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>                              <span class="at">add.vario =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>                              <span class="at">vario =</span> geovgm, </span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>                              <span class="at">invisible =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a><span class="do">##### Iacocesare ----</span></span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a><span class="fu">CorrParam</span>(<span class="st">"Iacocesare"</span>)</span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>init.ST_iac <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power2 =</span> <span class="dv">3</span>,</span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>                    <span class="at">power_s =</span> <span class="dv">2</span>,</span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>                    <span class="at">power_t =</span> <span class="fl">0.8</span>, </span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>                    <span class="at">scale_s =</span> <span class="fl">2e5</span>,</span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a>                    <span class="at">scale_t =</span> <span class="dv">3</span>,</span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sill =</span> var_est,</span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a>                    <span class="at">nugget =</span> <span class="fl">0.1</span>)</span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a>fixed.ST_iac <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>)</span>
+<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a>lwr.Iac <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power2 =</span> <span class="fl">1e-4</span>,</span>
+<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a>                <span class="at">power_s =</span> <span class="fl">1e-4</span>,</span>
+<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a>                <span class="at">power_t =</span> <span class="fl">1e-4</span>, </span>
+<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_s =</span> <span class="dv">0</span>,</span>
+<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_t =</span> <span class="dv">0</span>,</span>
+<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a>                <span class="at">sill =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>,</span>
+<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a>                <span class="at">nugget =</span> <span class="fl">0.1</span>)</span>
+<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a>upr.Iac <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power2 =</span> <span class="dv">2</span>,</span>
+<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a>                <span class="at">power_s =</span> <span class="dv">2</span>,</span>
+<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a>                <span class="at">power_t =</span> <span class="dv">2</span>, </span>
+<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_s =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_t =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a>                <span class="at">sill =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a>                <span class="at">nugget =</span> <span class="dv">1</span>)</span>
+<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a>geofit_iac <span class="ot">&lt;-</span> <span class="fu">GeoFit</span>(<span class="at">data =</span> geoMatrix, </span>
+<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a>                     <span class="at">coordx =</span> Stations[,<span class="fu">c</span>(<span class="st">"X"</span>, <span class="st">"Y"</span>)],</span>
+<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a>                     <span class="at">coordt =</span> <span class="fu">unique</span>(Temp.st<span class="sc">$</span>Day <span class="sc">-</span> <span class="fu">min</span>(Temp.st<span class="sc">$</span>Day)),</span>
+<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a>                     <span class="at">distance =</span> <span class="st">"Eucl"</span>, </span>
+<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a>                     <span class="at">maxtime =</span> <span class="dv">4</span>, <span class="at">maxdist =</span> maxdist<span class="sc">/</span><span class="dv">3</span>,</span>
+<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>                     <span class="at">model =</span> <span class="st">"Gaussian"</span>, </span>
+<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a>                     <span class="at">corrmodel =</span> <span class="st">"Iacocesare"</span>, </span>
+<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a>                     <span class="at">start =</span> init.ST_iac, </span>
+<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a>                     <span class="at">fixed =</span> fixed.ST_iac,</span>
+<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a>                     <span class="at">optimizer =</span> <span class="st">"L-BFGS-B"</span>,</span>
+<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a>                     <span class="at">lower =</span> lwr.Iac,</span>
+<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a>                     <span class="at">upper =</span> upr.Iac)</span>
+<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a>geofit_iac<span class="sc">$</span>logCompLik <span class="co"># -1376174</span></span>
+<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a>geocgvm_Iac <span class="ot">&lt;-</span> <span class="fu">GeoCovariogram</span>(<span class="at">fitted =</span> geofit_iac, </span>
+<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a>                              <span class="at">answer.vario =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-116"><a href="#cb6-116" aria-hidden="true" tabindex="-1"></a>                              <span class="at">show.vario =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb6-117"><a href="#cb6-117" aria-hidden="true" tabindex="-1"></a>                              <span class="at">add.vario =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb6-118"><a href="#cb6-118" aria-hidden="true" tabindex="-1"></a>                              <span class="at">vario =</span> geovgm, </span>
+<span id="cb6-119"><a href="#cb6-119" aria-hidden="true" tabindex="-1"></a>                              <span class="at">invisible =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-120"><a href="#cb6-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-121"><a href="#cb6-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-122"><a href="#cb6-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-123"><a href="#cb6-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-124"><a href="#cb6-124" aria-hidden="true" tabindex="-1"></a><span class="do">##### Porcu ----</span></span>
+<span id="cb6-125"><a href="#cb6-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-126"><a href="#cb6-126" aria-hidden="true" tabindex="-1"></a><span class="fu">CorrParam</span>(<span class="st">"Porcu"</span>)</span>
+<span id="cb6-127"><a href="#cb6-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-128"><a href="#cb6-128" aria-hidden="true" tabindex="-1"></a>init.ST_Por <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power_s =</span> <span class="dv">2</span>,</span>
+<span id="cb6-129"><a href="#cb6-129" aria-hidden="true" tabindex="-1"></a>                    <span class="at">power_t =</span> <span class="fl">0.8</span>, </span>
+<span id="cb6-130"><a href="#cb6-130" aria-hidden="true" tabindex="-1"></a>                    <span class="at">scale_s =</span> <span class="fl">2e5</span>,</span>
+<span id="cb6-131"><a href="#cb6-131" aria-hidden="true" tabindex="-1"></a>                    <span class="at">scale_t =</span> <span class="dv">3</span>,</span>
+<span id="cb6-132"><a href="#cb6-132" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sill =</span> var_est,</span>
+<span id="cb6-133"><a href="#cb6-133" aria-hidden="true" tabindex="-1"></a>                    <span class="at">nugget =</span> <span class="fl">0.1</span>,</span>
+<span id="cb6-134"><a href="#cb6-134" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sep =</span> <span class="fl">0.5</span>)</span>
+<span id="cb6-135"><a href="#cb6-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-136"><a href="#cb6-136" aria-hidden="true" tabindex="-1"></a>fixed.ST_Por <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>)</span>
+<span id="cb6-137"><a href="#cb6-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-138"><a href="#cb6-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-139"><a href="#cb6-139" aria-hidden="true" tabindex="-1"></a>lwr.Por <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power_s =</span> <span class="fl">1e-4</span>,</span>
+<span id="cb6-140"><a href="#cb6-140" aria-hidden="true" tabindex="-1"></a>                <span class="at">power_t =</span> <span class="fl">1e-4</span>, </span>
+<span id="cb6-141"><a href="#cb6-141" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_s =</span> <span class="dv">0</span>,</span>
+<span id="cb6-142"><a href="#cb6-142" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_t =</span> <span class="dv">0</span>,</span>
+<span id="cb6-143"><a href="#cb6-143" aria-hidden="true" tabindex="-1"></a>                <span class="at">sill =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>,</span>
+<span id="cb6-144"><a href="#cb6-144" aria-hidden="true" tabindex="-1"></a>                <span class="at">nugget =</span> <span class="fl">0.1</span>,</span>
+<span id="cb6-145"><a href="#cb6-145" aria-hidden="true" tabindex="-1"></a>                <span class="at">sep =</span> <span class="dv">0</span>)</span>
+<span id="cb6-146"><a href="#cb6-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-147"><a href="#cb6-147" aria-hidden="true" tabindex="-1"></a>upr.Por <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power_s =</span> <span class="dv">2</span>,</span>
+<span id="cb6-148"><a href="#cb6-148" aria-hidden="true" tabindex="-1"></a>                <span class="at">power_t =</span> <span class="dv">2</span>, </span>
+<span id="cb6-149"><a href="#cb6-149" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_s =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-150"><a href="#cb6-150" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_t =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-151"><a href="#cb6-151" aria-hidden="true" tabindex="-1"></a>                <span class="at">sill =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-152"><a href="#cb6-152" aria-hidden="true" tabindex="-1"></a>                <span class="at">nugget =</span> <span class="dv">1</span>,</span>
+<span id="cb6-153"><a href="#cb6-153" aria-hidden="true" tabindex="-1"></a>                <span class="at">sep =</span> <span class="dv">1</span>)</span>
+<span id="cb6-154"><a href="#cb6-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-155"><a href="#cb6-155" aria-hidden="true" tabindex="-1"></a>geofit_Por <span class="ot">&lt;-</span> <span class="fu">GeoFit</span>(<span class="at">data =</span> geoMatrix, </span>
+<span id="cb6-156"><a href="#cb6-156" aria-hidden="true" tabindex="-1"></a>                     <span class="at">coordx =</span> Stations[,<span class="fu">c</span>(<span class="st">"X"</span>, <span class="st">"Y"</span>)],</span>
+<span id="cb6-157"><a href="#cb6-157" aria-hidden="true" tabindex="-1"></a>                     <span class="at">coordt =</span> <span class="fu">unique</span>(Temp.st<span class="sc">$</span>Day <span class="sc">-</span> <span class="fu">min</span>(Temp.st<span class="sc">$</span>Day)),</span>
+<span id="cb6-158"><a href="#cb6-158" aria-hidden="true" tabindex="-1"></a>                     <span class="at">distance =</span> <span class="st">"Eucl"</span>, </span>
+<span id="cb6-159"><a href="#cb6-159" aria-hidden="true" tabindex="-1"></a>                     <span class="at">maxtime =</span> <span class="dv">4</span>, <span class="at">maxdist =</span> maxdist<span class="sc">/</span><span class="dv">3</span>,</span>
+<span id="cb6-160"><a href="#cb6-160" aria-hidden="true" tabindex="-1"></a>                     <span class="at">model =</span> <span class="st">"Gaussian"</span>, </span>
+<span id="cb6-161"><a href="#cb6-161" aria-hidden="true" tabindex="-1"></a>                     <span class="at">corrmodel =</span> <span class="st">"Porcu"</span>, </span>
+<span id="cb6-162"><a href="#cb6-162" aria-hidden="true" tabindex="-1"></a>                     <span class="at">start =</span> init.ST_Por, </span>
+<span id="cb6-163"><a href="#cb6-163" aria-hidden="true" tabindex="-1"></a>                     <span class="at">fixed =</span> fixed.ST_Por,</span>
+<span id="cb6-164"><a href="#cb6-164" aria-hidden="true" tabindex="-1"></a>                     <span class="at">optimizer =</span> <span class="st">"L-BFGS-B"</span>,</span>
+<span id="cb6-165"><a href="#cb6-165" aria-hidden="true" tabindex="-1"></a>                     <span class="at">lower =</span> lwr.Por,</span>
+<span id="cb6-166"><a href="#cb6-166" aria-hidden="true" tabindex="-1"></a>                     <span class="at">upper =</span> upr.Por)</span>
+<span id="cb6-167"><a href="#cb6-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-168"><a href="#cb6-168" aria-hidden="true" tabindex="-1"></a>geofit_Por<span class="sc">$</span>logCompLik <span class="co"># -1376660</span></span>
+<span id="cb6-169"><a href="#cb6-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-170"><a href="#cb6-170" aria-hidden="true" tabindex="-1"></a>geocgvm_Por <span class="ot">&lt;-</span> <span class="fu">GeoCovariogram</span>(<span class="at">fitted =</span> geofit_Por, </span>
+<span id="cb6-171"><a href="#cb6-171" aria-hidden="true" tabindex="-1"></a>                              <span class="at">answer.vario =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-172"><a href="#cb6-172" aria-hidden="true" tabindex="-1"></a>                              <span class="at">show.vario =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb6-173"><a href="#cb6-173" aria-hidden="true" tabindex="-1"></a>                              <span class="at">add.vario =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-174"><a href="#cb6-174" aria-hidden="true" tabindex="-1"></a>                              <span class="at">vario =</span> geovgm, </span>
+<span id="cb6-175"><a href="#cb6-175" aria-hidden="true" tabindex="-1"></a>                              <span class="at">invisible =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-176"><a href="#cb6-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-177"><a href="#cb6-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-178"><a href="#cb6-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-179"><a href="#cb6-179" aria-hidden="true" tabindex="-1"></a><span class="do">###### Porcu 1 ----</span></span>
+<span id="cb6-180"><a href="#cb6-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-181"><a href="#cb6-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-182"><a href="#cb6-182" aria-hidden="true" tabindex="-1"></a><span class="fu">CorrParam</span>(<span class="st">"Porcu"</span>)</span>
+<span id="cb6-183"><a href="#cb6-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-184"><a href="#cb6-184" aria-hidden="true" tabindex="-1"></a>init.ST_Por1 <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power_s =</span> <span class="dv">2</span>,</span>
+<span id="cb6-185"><a href="#cb6-185" aria-hidden="true" tabindex="-1"></a>                     <span class="at">power_t =</span> <span class="fl">0.8</span>, </span>
+<span id="cb6-186"><a href="#cb6-186" aria-hidden="true" tabindex="-1"></a>                     <span class="at">scale_s =</span> <span class="fl">2e5</span>,</span>
+<span id="cb6-187"><a href="#cb6-187" aria-hidden="true" tabindex="-1"></a>                     <span class="at">scale_t =</span> <span class="dv">3</span>,</span>
+<span id="cb6-188"><a href="#cb6-188" aria-hidden="true" tabindex="-1"></a>                     <span class="at">sill =</span> var_est,</span>
+<span id="cb6-189"><a href="#cb6-189" aria-hidden="true" tabindex="-1"></a>                     <span class="at">nugget =</span> <span class="fl">0.1</span>,</span>
+<span id="cb6-190"><a href="#cb6-190" aria-hidden="true" tabindex="-1"></a>                     <span class="at">sep =</span> <span class="fl">0.5</span>)</span>
+<span id="cb6-191"><a href="#cb6-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-192"><a href="#cb6-192" aria-hidden="true" tabindex="-1"></a>fixed.ST_Por1 <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>)</span>
+<span id="cb6-193"><a href="#cb6-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-194"><a href="#cb6-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-195"><a href="#cb6-195" aria-hidden="true" tabindex="-1"></a>lwr.Por1 <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power_s =</span> <span class="fl">1e-4</span>,</span>
+<span id="cb6-196"><a href="#cb6-196" aria-hidden="true" tabindex="-1"></a>                 <span class="at">power_t =</span> <span class="fl">1e-4</span>, </span>
+<span id="cb6-197"><a href="#cb6-197" aria-hidden="true" tabindex="-1"></a>                 <span class="at">scale_s =</span> <span class="dv">0</span>,</span>
+<span id="cb6-198"><a href="#cb6-198" aria-hidden="true" tabindex="-1"></a>                 <span class="at">scale_t =</span> <span class="dv">0</span>,</span>
+<span id="cb6-199"><a href="#cb6-199" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sill =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>,</span>
+<span id="cb6-200"><a href="#cb6-200" aria-hidden="true" tabindex="-1"></a>                 <span class="at">nugget =</span> <span class="fl">0.1</span>,</span>
+<span id="cb6-201"><a href="#cb6-201" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sep =</span> <span class="dv">0</span>)</span>
+<span id="cb6-202"><a href="#cb6-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-203"><a href="#cb6-203" aria-hidden="true" tabindex="-1"></a>upr.Por1 <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power_s =</span> <span class="dv">2</span>,</span>
+<span id="cb6-204"><a href="#cb6-204" aria-hidden="true" tabindex="-1"></a>                 <span class="at">power_t =</span> <span class="dv">2</span>, </span>
+<span id="cb6-205"><a href="#cb6-205" aria-hidden="true" tabindex="-1"></a>                 <span class="at">scale_s =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-206"><a href="#cb6-206" aria-hidden="true" tabindex="-1"></a>                 <span class="at">scale_t =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-207"><a href="#cb6-207" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sill =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-208"><a href="#cb6-208" aria-hidden="true" tabindex="-1"></a>                 <span class="at">nugget =</span> <span class="dv">1</span>,</span>
+<span id="cb6-209"><a href="#cb6-209" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sep =</span> <span class="dv">1</span>)</span>
+<span id="cb6-210"><a href="#cb6-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-211"><a href="#cb6-211" aria-hidden="true" tabindex="-1"></a>geofit_Por1 <span class="ot">&lt;-</span> <span class="fu">GeoFit</span>(<span class="at">data =</span> geoMatrix, </span>
+<span id="cb6-212"><a href="#cb6-212" aria-hidden="true" tabindex="-1"></a>                     <span class="at">coordx =</span> Stations[,<span class="fu">c</span>(<span class="st">"X"</span>, <span class="st">"Y"</span>)],</span>
+<span id="cb6-213"><a href="#cb6-213" aria-hidden="true" tabindex="-1"></a>                     <span class="at">coordt =</span> <span class="fu">unique</span>(Temp.st<span class="sc">$</span>Day <span class="sc">-</span> <span class="fu">min</span>(Temp.st<span class="sc">$</span>Day)),</span>
+<span id="cb6-214"><a href="#cb6-214" aria-hidden="true" tabindex="-1"></a>                     <span class="at">distance =</span> <span class="st">"Eucl"</span>, </span>
+<span id="cb6-215"><a href="#cb6-215" aria-hidden="true" tabindex="-1"></a>                     <span class="at">maxtime =</span> <span class="dv">4</span>, <span class="at">maxdist =</span> maxdist<span class="sc">/</span><span class="dv">3</span>,</span>
+<span id="cb6-216"><a href="#cb6-216" aria-hidden="true" tabindex="-1"></a>                     <span class="at">model =</span> <span class="st">"Gaussian"</span>, </span>
+<span id="cb6-217"><a href="#cb6-217" aria-hidden="true" tabindex="-1"></a>                     <span class="at">corrmodel =</span> <span class="st">"Porcu1"</span>, </span>
+<span id="cb6-218"><a href="#cb6-218" aria-hidden="true" tabindex="-1"></a>                     <span class="at">start =</span> init.ST_Por1, </span>
+<span id="cb6-219"><a href="#cb6-219" aria-hidden="true" tabindex="-1"></a>                     <span class="at">fixed =</span> fixed.ST_Por1,</span>
+<span id="cb6-220"><a href="#cb6-220" aria-hidden="true" tabindex="-1"></a>                     <span class="at">optimizer =</span> <span class="st">"L-BFGS-B"</span>,</span>
+<span id="cb6-221"><a href="#cb6-221" aria-hidden="true" tabindex="-1"></a>                     <span class="at">lower =</span> lwr.Por1,</span>
+<span id="cb6-222"><a href="#cb6-222" aria-hidden="true" tabindex="-1"></a>                     <span class="at">upper =</span> upr.Por1)</span>
+<span id="cb6-223"><a href="#cb6-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-224"><a href="#cb6-224" aria-hidden="true" tabindex="-1"></a>geofit_Por1<span class="sc">$</span>logCompLik <span class="co"># -1374162</span></span>
+<span id="cb6-225"><a href="#cb6-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-226"><a href="#cb6-226" aria-hidden="true" tabindex="-1"></a>geocgvm_Por1 <span class="ot">&lt;-</span> <span class="fu">GeoCovariogram</span>(<span class="at">fitted =</span> geofit_Por1, </span>
+<span id="cb6-227"><a href="#cb6-227" aria-hidden="true" tabindex="-1"></a>                              <span class="at">answer.vario =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-228"><a href="#cb6-228" aria-hidden="true" tabindex="-1"></a>                              <span class="at">show.vario =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb6-229"><a href="#cb6-229" aria-hidden="true" tabindex="-1"></a>                              <span class="at">add.vario =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-230"><a href="#cb6-230" aria-hidden="true" tabindex="-1"></a>                              <span class="at">vario =</span> geovgm, </span>
+<span id="cb6-231"><a href="#cb6-231" aria-hidden="true" tabindex="-1"></a>                              <span class="at">invisible =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-232"><a href="#cb6-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-233"><a href="#cb6-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-234"><a href="#cb6-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-235"><a href="#cb6-235" aria-hidden="true" tabindex="-1"></a><span class="do">##### Gneiting_mat_S ----</span></span>
+<span id="cb6-236"><a href="#cb6-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-237"><a href="#cb6-237" aria-hidden="true" tabindex="-1"></a><span class="fu">CorrParam</span>(<span class="st">"Gneiting_mat_S"</span>)</span>
+<span id="cb6-238"><a href="#cb6-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-239"><a href="#cb6-239" aria-hidden="true" tabindex="-1"></a>init.ST_GMS <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power_t =</span> <span class="fl">0.8</span>, </span>
+<span id="cb6-240"><a href="#cb6-240" aria-hidden="true" tabindex="-1"></a>                    <span class="at">power2_t =</span> <span class="dv">2</span>,</span>
+<span id="cb6-241"><a href="#cb6-241" aria-hidden="true" tabindex="-1"></a>                    <span class="at">scale_s =</span> <span class="fl">2e5</span>,</span>
+<span id="cb6-242"><a href="#cb6-242" aria-hidden="true" tabindex="-1"></a>                    <span class="at">scale_t =</span> <span class="dv">3</span>,</span>
+<span id="cb6-243"><a href="#cb6-243" aria-hidden="true" tabindex="-1"></a>                    <span class="at">smooth_s =</span> <span class="dv">2</span>,</span>
+<span id="cb6-244"><a href="#cb6-244" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sill =</span> var_est,</span>
+<span id="cb6-245"><a href="#cb6-245" aria-hidden="true" tabindex="-1"></a>                    <span class="at">nugget =</span> <span class="fl">0.1</span>,</span>
+<span id="cb6-246"><a href="#cb6-246" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sep =</span> <span class="fl">0.5</span>)</span>
+<span id="cb6-247"><a href="#cb6-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-248"><a href="#cb6-248" aria-hidden="true" tabindex="-1"></a>fixed.ST_GMS <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>)</span>
+<span id="cb6-249"><a href="#cb6-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-250"><a href="#cb6-250" aria-hidden="true" tabindex="-1"></a><span class="fu">GeoCovmatrix</span>(<span class="at">corrmodel =</span> <span class="st">"Gneiting_mat_S"</span>, </span>
+<span id="cb6-251"><a href="#cb6-251" aria-hidden="true" tabindex="-1"></a>             <span class="at">coordx =</span> Stations[,<span class="fu">c</span>(<span class="st">"X"</span>, <span class="st">"Y"</span>)],</span>
+<span id="cb6-252"><a href="#cb6-252" aria-hidden="true" tabindex="-1"></a>             <span class="at">coordt =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,</span>
+<span id="cb6-253"><a href="#cb6-253" aria-hidden="true" tabindex="-1"></a>             <span class="at">model =</span> <span class="st">"Gaussian"</span>,</span>
+<span id="cb6-254"><a href="#cb6-254" aria-hidden="true" tabindex="-1"></a>             <span class="at">param =</span> init.ST_GMS)</span>
+<span id="cb6-255"><a href="#cb6-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-256"><a href="#cb6-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-257"><a href="#cb6-257" aria-hidden="true" tabindex="-1"></a>lwr.GMS <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power_t =</span> <span class="fl">1e-4</span>, </span>
+<span id="cb6-258"><a href="#cb6-258" aria-hidden="true" tabindex="-1"></a>                <span class="at">power2_t =</span> <span class="fl">1e-4</span>,</span>
+<span id="cb6-259"><a href="#cb6-259" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_s =</span> <span class="dv">0</span>,</span>
+<span id="cb6-260"><a href="#cb6-260" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_t =</span> <span class="dv">0</span>,</span>
+<span id="cb6-261"><a href="#cb6-261" aria-hidden="true" tabindex="-1"></a>                <span class="at">smooth_s =</span> <span class="fl">1e-4</span>,</span>
+<span id="cb6-262"><a href="#cb6-262" aria-hidden="true" tabindex="-1"></a>                <span class="at">sill =</span> <span class="dv">0</span>,</span>
+<span id="cb6-263"><a href="#cb6-263" aria-hidden="true" tabindex="-1"></a>                <span class="at">nugget =</span> <span class="fl">1e-4</span>,</span>
+<span id="cb6-264"><a href="#cb6-264" aria-hidden="true" tabindex="-1"></a>                <span class="at">sep =</span> <span class="dv">0</span>)</span>
+<span id="cb6-265"><a href="#cb6-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-266"><a href="#cb6-266" aria-hidden="true" tabindex="-1"></a>upr.GMS <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power_t =</span> <span class="dv">2</span>, </span>
+<span id="cb6-267"><a href="#cb6-267" aria-hidden="true" tabindex="-1"></a>                <span class="at">power2_t =</span> <span class="dv">2</span>,</span>
+<span id="cb6-268"><a href="#cb6-268" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_s =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-269"><a href="#cb6-269" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_t =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-270"><a href="#cb6-270" aria-hidden="true" tabindex="-1"></a>                <span class="at">smooth_s =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-271"><a href="#cb6-271" aria-hidden="true" tabindex="-1"></a>                <span class="at">sill =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-272"><a href="#cb6-272" aria-hidden="true" tabindex="-1"></a>                <span class="at">nugget =</span> <span class="dv">2</span>,</span>
+<span id="cb6-273"><a href="#cb6-273" aria-hidden="true" tabindex="-1"></a>                <span class="at">sep =</span> <span class="dv">1</span>)</span>
+<span id="cb6-274"><a href="#cb6-274" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-275"><a href="#cb6-275" aria-hidden="true" tabindex="-1"></a>geofit_GMS <span class="ot">&lt;-</span> <span class="fu">GeoFit</span>(<span class="at">data =</span> geoMatrix, </span>
+<span id="cb6-276"><a href="#cb6-276" aria-hidden="true" tabindex="-1"></a>                     <span class="at">coordx =</span> Stations[,<span class="fu">c</span>(<span class="st">"X"</span>, <span class="st">"Y"</span>)],</span>
+<span id="cb6-277"><a href="#cb6-277" aria-hidden="true" tabindex="-1"></a>                     <span class="at">coordt =</span> <span class="fu">unique</span>(Temp.st<span class="sc">$</span>Day <span class="sc">-</span> <span class="fu">min</span>(Temp.st<span class="sc">$</span>Day)),</span>
+<span id="cb6-278"><a href="#cb6-278" aria-hidden="true" tabindex="-1"></a>                     <span class="at">distance =</span> <span class="st">"Eucl"</span>, </span>
+<span id="cb6-279"><a href="#cb6-279" aria-hidden="true" tabindex="-1"></a>                     <span class="at">maxtime =</span> <span class="dv">4</span>, <span class="at">maxdist =</span> maxdist<span class="sc">/</span><span class="dv">3</span>,</span>
+<span id="cb6-280"><a href="#cb6-280" aria-hidden="true" tabindex="-1"></a>                     <span class="at">model =</span> <span class="st">"Gaussian"</span>, </span>
+<span id="cb6-281"><a href="#cb6-281" aria-hidden="true" tabindex="-1"></a>                     <span class="at">corrmodel =</span> <span class="st">"Gneiting_mat_S"</span>, </span>
+<span id="cb6-282"><a href="#cb6-282" aria-hidden="true" tabindex="-1"></a>                     <span class="at">start =</span> init.ST_GMS, </span>
+<span id="cb6-283"><a href="#cb6-283" aria-hidden="true" tabindex="-1"></a>                     <span class="at">fixed =</span> fixed.ST_GMS,</span>
+<span id="cb6-284"><a href="#cb6-284" aria-hidden="true" tabindex="-1"></a>                     <span class="at">optimizer =</span> <span class="st">"L-BFGS-B"</span>,</span>
+<span id="cb6-285"><a href="#cb6-285" aria-hidden="true" tabindex="-1"></a>                     <span class="at">lower =</span> lwr.GMS,</span>
+<span id="cb6-286"><a href="#cb6-286" aria-hidden="true" tabindex="-1"></a>                     <span class="at">upper =</span> upr.GMS)</span>
+<span id="cb6-287"><a href="#cb6-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-288"><a href="#cb6-288" aria-hidden="true" tabindex="-1"></a>geofit_GMS<span class="sc">$</span>logCompLik <span class="co"># -1376660</span></span>
+<span id="cb6-289"><a href="#cb6-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-290"><a href="#cb6-290" aria-hidden="true" tabindex="-1"></a>geocgvm_GMS <span class="ot">&lt;-</span> <span class="fu">GeoCovariogram</span>(<span class="at">fitted =</span> geofit_GMS, </span>
+<span id="cb6-291"><a href="#cb6-291" aria-hidden="true" tabindex="-1"></a>                              <span class="at">answer.vario =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-292"><a href="#cb6-292" aria-hidden="true" tabindex="-1"></a>                              <span class="at">show.vario =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb6-293"><a href="#cb6-293" aria-hidden="true" tabindex="-1"></a>                              <span class="at">add.vario =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-294"><a href="#cb6-294" aria-hidden="true" tabindex="-1"></a>                              <span class="at">vario =</span> geovgm, </span>
+<span id="cb6-295"><a href="#cb6-295" aria-hidden="true" tabindex="-1"></a>                              <span class="at">invisible =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-296"><a href="#cb6-296" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-297"><a href="#cb6-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-298"><a href="#cb6-298" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-299"><a href="#cb6-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-300"><a href="#cb6-300" aria-hidden="true" tabindex="-1"></a><span class="do">##### Gneiting_mat_T ----</span></span>
+<span id="cb6-301"><a href="#cb6-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-302"><a href="#cb6-302" aria-hidden="true" tabindex="-1"></a><span class="fu">CorrParam</span>(<span class="st">"Gneiting_mat_T"</span>)</span>
+<span id="cb6-303"><a href="#cb6-303" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-304"><a href="#cb6-304" aria-hidden="true" tabindex="-1"></a>init.ST_GMT <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power_t =</span> <span class="fl">0.8</span>, </span>
+<span id="cb6-305"><a href="#cb6-305" aria-hidden="true" tabindex="-1"></a>                    <span class="at">power2_t =</span> <span class="dv">2</span>,</span>
+<span id="cb6-306"><a href="#cb6-306" aria-hidden="true" tabindex="-1"></a>                    <span class="at">scale_s =</span> <span class="fl">2e5</span>,</span>
+<span id="cb6-307"><a href="#cb6-307" aria-hidden="true" tabindex="-1"></a>                    <span class="at">scale_t =</span> <span class="dv">3</span>,</span>
+<span id="cb6-308"><a href="#cb6-308" aria-hidden="true" tabindex="-1"></a>                    <span class="at">smooth_s =</span> <span class="dv">2</span>,</span>
+<span id="cb6-309"><a href="#cb6-309" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sill =</span> var_est,</span>
+<span id="cb6-310"><a href="#cb6-310" aria-hidden="true" tabindex="-1"></a>                    <span class="at">nugget =</span> <span class="fl">0.1</span>,</span>
+<span id="cb6-311"><a href="#cb6-311" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sep =</span> <span class="fl">0.5</span>)</span>
+<span id="cb6-312"><a href="#cb6-312" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-313"><a href="#cb6-313" aria-hidden="true" tabindex="-1"></a>fixed.ST_GMT <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>)</span>
+<span id="cb6-314"><a href="#cb6-314" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-315"><a href="#cb6-315" aria-hidden="true" tabindex="-1"></a><span class="fu">GeoCovmatrix</span>(<span class="at">corrmodel =</span> <span class="st">"Gneiting_mat_S"</span>, </span>
+<span id="cb6-316"><a href="#cb6-316" aria-hidden="true" tabindex="-1"></a>             <span class="at">coordx =</span> Stations[,<span class="fu">c</span>(<span class="st">"X"</span>, <span class="st">"Y"</span>)],</span>
+<span id="cb6-317"><a href="#cb6-317" aria-hidden="true" tabindex="-1"></a>             <span class="at">coordt =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,</span>
+<span id="cb6-318"><a href="#cb6-318" aria-hidden="true" tabindex="-1"></a>             <span class="at">model =</span> <span class="st">"Gaussian"</span>,</span>
+<span id="cb6-319"><a href="#cb6-319" aria-hidden="true" tabindex="-1"></a>             <span class="at">param =</span> init.ST_GMT)</span>
+<span id="cb6-320"><a href="#cb6-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-321"><a href="#cb6-321" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-322"><a href="#cb6-322" aria-hidden="true" tabindex="-1"></a>lwr.GMT <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power_t =</span> <span class="fl">1e-4</span>, </span>
+<span id="cb6-323"><a href="#cb6-323" aria-hidden="true" tabindex="-1"></a>                <span class="at">power2_t =</span> <span class="fl">1e-4</span>,</span>
+<span id="cb6-324"><a href="#cb6-324" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_s =</span> <span class="dv">0</span>,</span>
+<span id="cb6-325"><a href="#cb6-325" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_t =</span> <span class="dv">0</span>,</span>
+<span id="cb6-326"><a href="#cb6-326" aria-hidden="true" tabindex="-1"></a>                <span class="at">smooth_s =</span> <span class="fl">1e-4</span>,</span>
+<span id="cb6-327"><a href="#cb6-327" aria-hidden="true" tabindex="-1"></a>                <span class="at">sill =</span> <span class="dv">0</span>,</span>
+<span id="cb6-328"><a href="#cb6-328" aria-hidden="true" tabindex="-1"></a>                <span class="at">nugget =</span> <span class="fl">1e-4</span>,</span>
+<span id="cb6-329"><a href="#cb6-329" aria-hidden="true" tabindex="-1"></a>                <span class="at">sep =</span> <span class="dv">0</span>)</span>
+<span id="cb6-330"><a href="#cb6-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-331"><a href="#cb6-331" aria-hidden="true" tabindex="-1"></a>upr.GMT <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power_t =</span> <span class="dv">2</span>, </span>
+<span id="cb6-332"><a href="#cb6-332" aria-hidden="true" tabindex="-1"></a>                <span class="at">power2_t =</span> <span class="dv">2</span>,</span>
+<span id="cb6-333"><a href="#cb6-333" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_s =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-334"><a href="#cb6-334" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_t =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-335"><a href="#cb6-335" aria-hidden="true" tabindex="-1"></a>                <span class="at">smooth_s =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-336"><a href="#cb6-336" aria-hidden="true" tabindex="-1"></a>                <span class="at">sill =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-337"><a href="#cb6-337" aria-hidden="true" tabindex="-1"></a>                <span class="at">nugget =</span> <span class="dv">2</span>,</span>
+<span id="cb6-338"><a href="#cb6-338" aria-hidden="true" tabindex="-1"></a>                <span class="at">sep =</span> <span class="dv">1</span>)</span>
+<span id="cb6-339"><a href="#cb6-339" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-340"><a href="#cb6-340" aria-hidden="true" tabindex="-1"></a>geofit_GMT <span class="ot">&lt;-</span> <span class="fu">GeoFit</span>(<span class="at">data =</span> geoMatrix, </span>
+<span id="cb6-341"><a href="#cb6-341" aria-hidden="true" tabindex="-1"></a>                     <span class="at">coordx =</span> Stations[,<span class="fu">c</span>(<span class="st">"X"</span>, <span class="st">"Y"</span>)],</span>
+<span id="cb6-342"><a href="#cb6-342" aria-hidden="true" tabindex="-1"></a>                     <span class="at">coordt =</span> <span class="fu">unique</span>(Temp.st<span class="sc">$</span>Day <span class="sc">-</span> <span class="fu">min</span>(Temp.st<span class="sc">$</span>Day)),</span>
+<span id="cb6-343"><a href="#cb6-343" aria-hidden="true" tabindex="-1"></a>                     <span class="at">distance =</span> <span class="st">"Eucl"</span>, </span>
+<span id="cb6-344"><a href="#cb6-344" aria-hidden="true" tabindex="-1"></a>                     <span class="at">maxtime =</span> <span class="dv">4</span>, <span class="at">maxdist =</span> maxdist<span class="sc">/</span><span class="dv">3</span>,</span>
+<span id="cb6-345"><a href="#cb6-345" aria-hidden="true" tabindex="-1"></a>                     <span class="at">model =</span> <span class="st">"Gaussian"</span>, </span>
+<span id="cb6-346"><a href="#cb6-346" aria-hidden="true" tabindex="-1"></a>                     <span class="at">corrmodel =</span> <span class="st">"Gneiting_mat_S"</span>, </span>
+<span id="cb6-347"><a href="#cb6-347" aria-hidden="true" tabindex="-1"></a>                     <span class="at">start =</span> init.ST_GMT, </span>
+<span id="cb6-348"><a href="#cb6-348" aria-hidden="true" tabindex="-1"></a>                     <span class="at">fixed =</span> fixed.ST_GMT,</span>
+<span id="cb6-349"><a href="#cb6-349" aria-hidden="true" tabindex="-1"></a>                     <span class="at">optimizer =</span> <span class="st">"L-BFGS-B"</span>,</span>
+<span id="cb6-350"><a href="#cb6-350" aria-hidden="true" tabindex="-1"></a>                     <span class="at">lower =</span> lwr.GMT,</span>
+<span id="cb6-351"><a href="#cb6-351" aria-hidden="true" tabindex="-1"></a>                     <span class="at">upper =</span> upr.GMT)</span>
+<span id="cb6-352"><a href="#cb6-352" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-353"><a href="#cb6-353" aria-hidden="true" tabindex="-1"></a>geofit_GMT<span class="sc">$</span>logCompLik <span class="co"># -1376660</span></span>
+<span id="cb6-354"><a href="#cb6-354" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-355"><a href="#cb6-355" aria-hidden="true" tabindex="-1"></a>geocgvm_GMT <span class="ot">&lt;-</span> <span class="fu">GeoCovariogram</span>(<span class="at">fitted =</span> geofit_GMT, </span>
+<span id="cb6-356"><a href="#cb6-356" aria-hidden="true" tabindex="-1"></a>                              <span class="at">answer.vario =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-357"><a href="#cb6-357" aria-hidden="true" tabindex="-1"></a>                              <span class="at">show.vario =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb6-358"><a href="#cb6-358" aria-hidden="true" tabindex="-1"></a>                              <span class="at">add.vario =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-359"><a href="#cb6-359" aria-hidden="true" tabindex="-1"></a>                              <span class="at">vario =</span> geovgm, </span>
+<span id="cb6-360"><a href="#cb6-360" aria-hidden="true" tabindex="-1"></a>                              <span class="at">invisible =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-361"><a href="#cb6-361" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-362"><a href="#cb6-362" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-363"><a href="#cb6-363" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-364"><a href="#cb6-364" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-365"><a href="#cb6-365" aria-hidden="true" tabindex="-1"></a><span class="do">##### Matern_Matern_nosep ----</span></span>
+<span id="cb6-366"><a href="#cb6-366" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-367"><a href="#cb6-367" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-368"><a href="#cb6-368" aria-hidden="true" tabindex="-1"></a><span class="fu">CorrParam</span>(<span class="st">"Matern_Matern_nosep"</span>)</span>
+<span id="cb6-369"><a href="#cb6-369" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-370"><a href="#cb6-370" aria-hidden="true" tabindex="-1"></a>init.ST_Mat_Mat <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">scale_s =</span> <span class="fl">2e5</span>,</span>
+<span id="cb6-371"><a href="#cb6-371" aria-hidden="true" tabindex="-1"></a>                        <span class="at">scale_t =</span> <span class="dv">3</span>,</span>
+<span id="cb6-372"><a href="#cb6-372" aria-hidden="true" tabindex="-1"></a>                        <span class="at">smooth_s =</span> <span class="dv">1</span>,</span>
+<span id="cb6-373"><a href="#cb6-373" aria-hidden="true" tabindex="-1"></a>                        <span class="at">smooth_t =</span> <span class="dv">1</span>,</span>
+<span id="cb6-374"><a href="#cb6-374" aria-hidden="true" tabindex="-1"></a>                        <span class="at">sill =</span> var_est,</span>
+<span id="cb6-375"><a href="#cb6-375" aria-hidden="true" tabindex="-1"></a>                        <span class="at">nugget =</span> <span class="fl">0.1</span>,</span>
+<span id="cb6-376"><a href="#cb6-376" aria-hidden="true" tabindex="-1"></a>                        <span class="at">sep =</span> <span class="fl">0.5</span>)</span>
+<span id="cb6-377"><a href="#cb6-377" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-378"><a href="#cb6-378" aria-hidden="true" tabindex="-1"></a>fixed.ST <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>)</span>
+<span id="cb6-379"><a href="#cb6-379" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-380"><a href="#cb6-380" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-381"><a href="#cb6-381" aria-hidden="true" tabindex="-1"></a><span class="fu">GeoCovmatrix</span>(<span class="at">corrmodel =</span> <span class="st">"Matern_Matern_nosep"</span>, </span>
+<span id="cb6-382"><a href="#cb6-382" aria-hidden="true" tabindex="-1"></a>             <span class="at">coordx =</span> Stations[,<span class="fu">c</span>(<span class="st">"X"</span>, <span class="st">"Y"</span>)],</span>
+<span id="cb6-383"><a href="#cb6-383" aria-hidden="true" tabindex="-1"></a>             <span class="at">coordt =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,</span>
+<span id="cb6-384"><a href="#cb6-384" aria-hidden="true" tabindex="-1"></a>             <span class="at">model =</span> <span class="st">"Gaussian"</span>,</span>
+<span id="cb6-385"><a href="#cb6-385" aria-hidden="true" tabindex="-1"></a>             <span class="at">param =</span> init.ST_Mat_Mat)</span>
+<span id="cb6-386"><a href="#cb6-386" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-387"><a href="#cb6-387" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-388"><a href="#cb6-388" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-389"><a href="#cb6-389" aria-hidden="true" tabindex="-1"></a>lwr.Mat_Mat <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">scale_s =</span> <span class="dv">0</span>,</span>
+<span id="cb6-390"><a href="#cb6-390" aria-hidden="true" tabindex="-1"></a>                    <span class="at">scale_t =</span> <span class="dv">0</span>,</span>
+<span id="cb6-391"><a href="#cb6-391" aria-hidden="true" tabindex="-1"></a>                    <span class="at">smooth_s =</span> <span class="fl">1e-10</span>,</span>
+<span id="cb6-392"><a href="#cb6-392" aria-hidden="true" tabindex="-1"></a>                    <span class="at">smooth_t =</span> <span class="fl">1e-10</span>,</span>
+<span id="cb6-393"><a href="#cb6-393" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sill =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>,</span>
+<span id="cb6-394"><a href="#cb6-394" aria-hidden="true" tabindex="-1"></a>                    <span class="at">nugget =</span> <span class="fl">0.01</span>,</span>
+<span id="cb6-395"><a href="#cb6-395" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sep =</span> <span class="dv">0</span>)</span>
+<span id="cb6-396"><a href="#cb6-396" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-397"><a href="#cb6-397" aria-hidden="true" tabindex="-1"></a>upr.Mat_Mat <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">scale_s =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-398"><a href="#cb6-398" aria-hidden="true" tabindex="-1"></a>                    <span class="at">scale_t =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-399"><a href="#cb6-399" aria-hidden="true" tabindex="-1"></a>                    <span class="at">smooth_s =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-400"><a href="#cb6-400" aria-hidden="true" tabindex="-1"></a>                    <span class="at">smooth_t =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-401"><a href="#cb6-401" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sill =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-402"><a href="#cb6-402" aria-hidden="true" tabindex="-1"></a>                    <span class="at">nugget =</span> <span class="dv">2</span>,</span>
+<span id="cb6-403"><a href="#cb6-403" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sep =</span> <span class="dv">1</span>)</span>
+<span id="cb6-404"><a href="#cb6-404" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-405"><a href="#cb6-405" aria-hidden="true" tabindex="-1"></a>geofit_Mat_Mat <span class="ot">&lt;-</span> <span class="fu">GeoFit</span>(<span class="at">data =</span> geoMatrix, </span>
+<span id="cb6-406"><a href="#cb6-406" aria-hidden="true" tabindex="-1"></a>                         <span class="at">coordx =</span> Stations[,<span class="fu">c</span>(<span class="st">"X"</span>, <span class="st">"Y"</span>)],</span>
+<span id="cb6-407"><a href="#cb6-407" aria-hidden="true" tabindex="-1"></a>                         <span class="at">coordt =</span> <span class="fu">unique</span>(Temp.st<span class="sc">$</span>Day <span class="sc">-</span> <span class="fu">min</span>(Temp.st<span class="sc">$</span>Day)),</span>
+<span id="cb6-408"><a href="#cb6-408" aria-hidden="true" tabindex="-1"></a>                         <span class="at">distance =</span> <span class="st">"Eucl"</span>, </span>
+<span id="cb6-409"><a href="#cb6-409" aria-hidden="true" tabindex="-1"></a>                         <span class="at">maxtime =</span> <span class="dv">4</span>, <span class="at">maxdist =</span> maxdist<span class="sc">/</span><span class="dv">3</span>,</span>
+<span id="cb6-410"><a href="#cb6-410" aria-hidden="true" tabindex="-1"></a>                         <span class="at">model =</span> <span class="st">"Gaussian"</span>, </span>
+<span id="cb6-411"><a href="#cb6-411" aria-hidden="true" tabindex="-1"></a>                         <span class="at">corrmodel =</span> <span class="st">"Matern_Matern_nosep"</span>, </span>
+<span id="cb6-412"><a href="#cb6-412" aria-hidden="true" tabindex="-1"></a>                         <span class="at">start =</span> init.ST_Mat_Mat, </span>
+<span id="cb6-413"><a href="#cb6-413" aria-hidden="true" tabindex="-1"></a>                         <span class="at">fixed =</span> fixed.ST,</span>
+<span id="cb6-414"><a href="#cb6-414" aria-hidden="true" tabindex="-1"></a>                         <span class="at">optimizer =</span> <span class="st">"L-BFGS-B"</span>,</span>
+<span id="cb6-415"><a href="#cb6-415" aria-hidden="true" tabindex="-1"></a>                         <span class="at">lower =</span> lwr.Mat_Mat,</span>
+<span id="cb6-416"><a href="#cb6-416" aria-hidden="true" tabindex="-1"></a>                         <span class="at">upper =</span> upr.Mat_Mat)</span>
+<span id="cb6-417"><a href="#cb6-417" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-418"><a href="#cb6-418" aria-hidden="true" tabindex="-1"></a>geofit_Mat_Mat<span class="sc">$</span>logCompLik <span class="co">#-1375451 </span></span>
+<span id="cb6-419"><a href="#cb6-419" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-420"><a href="#cb6-420" aria-hidden="true" tabindex="-1"></a>geocgvm_Mat_Mat <span class="ot">&lt;-</span> <span class="fu">GeoCovariogram</span>(<span class="at">fitted =</span> geofit_Mat_Mat, </span>
+<span id="cb6-421"><a href="#cb6-421" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">answer.vario =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-422"><a href="#cb6-422" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">show.vario =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb6-423"><a href="#cb6-423" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">add.vario =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-424"><a href="#cb6-424" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">vario =</span> geovgm, </span>
+<span id="cb6-425"><a href="#cb6-425" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">invisible =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-426"><a href="#cb6-426" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-427"><a href="#cb6-427" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-428"><a href="#cb6-428" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-429"><a href="#cb6-429" aria-hidden="true" tabindex="-1"></a><span class="do">##### Multiquadric_st ----</span></span>
+<span id="cb6-430"><a href="#cb6-430" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-431"><a href="#cb6-431" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-432"><a href="#cb6-432" aria-hidden="true" tabindex="-1"></a><span class="fu">CorrParam</span>(<span class="st">"Multiquadric_st"</span>)</span>
+<span id="cb6-433"><a href="#cb6-433" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-434"><a href="#cb6-434" aria-hidden="true" tabindex="-1"></a>init.ST_Mul <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power_s =</span> <span class="dv">2</span>,</span>
+<span id="cb6-435"><a href="#cb6-435" aria-hidden="true" tabindex="-1"></a>                    <span class="at">power_t =</span> <span class="fl">0.8</span>, </span>
+<span id="cb6-436"><a href="#cb6-436" aria-hidden="true" tabindex="-1"></a>                    <span class="at">scale_s =</span> <span class="fl">2e5</span>,</span>
+<span id="cb6-437"><a href="#cb6-437" aria-hidden="true" tabindex="-1"></a>                    <span class="at">scale_t =</span> <span class="dv">3</span>,</span>
+<span id="cb6-438"><a href="#cb6-438" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sill =</span> var_est,</span>
+<span id="cb6-439"><a href="#cb6-439" aria-hidden="true" tabindex="-1"></a>                    <span class="at">nugget =</span> <span class="fl">0.1</span>)</span>
+<span id="cb6-440"><a href="#cb6-440" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-441"><a href="#cb6-441" aria-hidden="true" tabindex="-1"></a>fixed.ST_Mul <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>)</span>
+<span id="cb6-442"><a href="#cb6-442" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-443"><a href="#cb6-443" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-444"><a href="#cb6-444" aria-hidden="true" tabindex="-1"></a>lwr.Mul <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power_s =</span> <span class="fl">1e-4</span>,</span>
+<span id="cb6-445"><a href="#cb6-445" aria-hidden="true" tabindex="-1"></a>                <span class="at">power_t =</span> <span class="fl">1e-4</span>, </span>
+<span id="cb6-446"><a href="#cb6-446" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_s =</span> <span class="dv">0</span>,</span>
+<span id="cb6-447"><a href="#cb6-447" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_t =</span> <span class="dv">0</span>,</span>
+<span id="cb6-448"><a href="#cb6-448" aria-hidden="true" tabindex="-1"></a>                <span class="at">sill =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>,</span>
+<span id="cb6-449"><a href="#cb6-449" aria-hidden="true" tabindex="-1"></a>                <span class="at">nugget =</span> <span class="fl">0.001</span>)</span>
+<span id="cb6-450"><a href="#cb6-450" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-451"><a href="#cb6-451" aria-hidden="true" tabindex="-1"></a>upr.Mul <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">power_s =</span> <span class="dv">2</span>,</span>
+<span id="cb6-452"><a href="#cb6-452" aria-hidden="true" tabindex="-1"></a>                <span class="at">power_t =</span> <span class="dv">2</span>, </span>
+<span id="cb6-453"><a href="#cb6-453" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_s =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-454"><a href="#cb6-454" aria-hidden="true" tabindex="-1"></a>                <span class="at">scale_t =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-455"><a href="#cb6-455" aria-hidden="true" tabindex="-1"></a>                <span class="at">sill =</span> <span class="cn">Inf</span>,</span>
+<span id="cb6-456"><a href="#cb6-456" aria-hidden="true" tabindex="-1"></a>                <span class="at">nugget =</span> <span class="dv">2</span>)</span>
+<span id="cb6-457"><a href="#cb6-457" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-458"><a href="#cb6-458" aria-hidden="true" tabindex="-1"></a>geofit_Mul <span class="ot">&lt;-</span> <span class="fu">GeoFit</span>(<span class="at">data =</span> geoMatrix, </span>
+<span id="cb6-459"><a href="#cb6-459" aria-hidden="true" tabindex="-1"></a>                     <span class="at">coordx =</span> Stations[,<span class="fu">c</span>(<span class="st">"X"</span>, <span class="st">"Y"</span>)],</span>
+<span id="cb6-460"><a href="#cb6-460" aria-hidden="true" tabindex="-1"></a>                     <span class="at">coordt =</span> <span class="fu">unique</span>(Temp.st<span class="sc">$</span>Day <span class="sc">-</span> <span class="fu">min</span>(Temp.st<span class="sc">$</span>Day)),</span>
+<span id="cb6-461"><a href="#cb6-461" aria-hidden="true" tabindex="-1"></a>                     <span class="at">distance =</span> <span class="st">"Eucl"</span>, </span>
+<span id="cb6-462"><a href="#cb6-462" aria-hidden="true" tabindex="-1"></a>                     <span class="at">maxtime =</span> <span class="dv">4</span>, <span class="at">maxdist =</span> maxdist<span class="sc">/</span><span class="dv">3</span>,</span>
+<span id="cb6-463"><a href="#cb6-463" aria-hidden="true" tabindex="-1"></a>                     <span class="at">model =</span> <span class="st">"Gaussian"</span>, </span>
+<span id="cb6-464"><a href="#cb6-464" aria-hidden="true" tabindex="-1"></a>                     <span class="at">corrmodel =</span> <span class="st">"Multiquadric_st"</span>, </span>
+<span id="cb6-465"><a href="#cb6-465" aria-hidden="true" tabindex="-1"></a>                     <span class="at">start =</span> init.ST_Mul, </span>
+<span id="cb6-466"><a href="#cb6-466" aria-hidden="true" tabindex="-1"></a>                     <span class="at">fixed =</span> fixed.ST_Mul,</span>
+<span id="cb6-467"><a href="#cb6-467" aria-hidden="true" tabindex="-1"></a>                     <span class="at">optimizer =</span> <span class="st">"L-BFGS-B"</span>,</span>
+<span id="cb6-468"><a href="#cb6-468" aria-hidden="true" tabindex="-1"></a>                     <span class="at">lower =</span> lwr.Mul,</span>
+<span id="cb6-469"><a href="#cb6-469" aria-hidden="true" tabindex="-1"></a>                     <span class="at">upper =</span> upr.Mul)</span>
+<span id="cb6-470"><a href="#cb6-470" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-471"><a href="#cb6-471" aria-hidden="true" tabindex="-1"></a>geofit_Mul<span class="sc">$</span>logCompLik <span class="co"># -1376779</span></span>
+<span id="cb6-472"><a href="#cb6-472" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-473"><a href="#cb6-473" aria-hidden="true" tabindex="-1"></a>geocgvm_Mul <span class="ot">&lt;-</span> <span class="fu">GeoCovariogram</span>(<span class="at">fitted =</span> geofit_Mul,</span>
+<span id="cb6-474"><a href="#cb6-474" aria-hidden="true" tabindex="-1"></a>                              <span class="at">show.vario =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-475"><a href="#cb6-475" aria-hidden="true" tabindex="-1"></a>                              <span class="at">vario =</span> geovgm, </span>
+<span id="cb6-476"><a href="#cb6-476" aria-hidden="true" tabindex="-1"></a>                              <span class="at">invisible =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Por motivos de eficiencia, se guardaron los resultados de estos modelos en un archivo aparte. Primero se muestra el semivariograma teórico obtenido con el modelo Mátern Mátern</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">"geofitST.RData"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">GeoCovariogram</span>(<span class="at">fitted =</span> geofitST<span class="sc">$</span>MatMat, </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">answer.vario =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">show.vario =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">add.vario =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">vario =</span> geovgm, </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">invisible =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="spacetime_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Y también del modelo Gneiting:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">GeoCovariogram</span>(<span class="at">fitted =</span> geofitST<span class="sc">$</span>Gneiting, </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">answer.vario =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">show.vario =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">add.vario =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">vario =</span> geovgm, </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">invisible =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="spacetime_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Y se resumen sus log–verosimilitudes compuestas:</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Comparación Modelos Espacio Tiempo</caption>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: center;">Log-Verosimilitud Compuesta</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Gneiting</td>
+<td style="text-align: center;">-1376261</td>
+</tr>
+<tr class="even">
+<td>MatMat</td>
+<td style="text-align: center;">-1375451</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>A pesar de que con el modelo Mátern Mátern obtenemos una log–verosimilitud mayor, al intentar realizar kriging espacio temporal, este da resultados que no tienen mucho sentido. Por lo tanto, se procede al análisis con el modelo Gneiting.</p>
+</section>
+</section>
+</section>
+<section id="kriging-espacio-tiempo" class="level3">
+<h3 class="anchored" data-anchor-id="kriging-espacio-tiempo">Kriging Espacio Tiempo</h3>
+<p>Se va a realizar kriging espacio tiempo con el modelo Gneiting. Los parámetros obtenidos fueron los siguientes:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>best_pars <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">unlist</span>(geofitST<span class="sc">$</span>Gneiting<span class="sc">$</span>param))</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>best_pars <span class="sc">%&gt;%</span> </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">format =</span> <span class="st">"pandoc"</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">digits =</span> <span class="dv">4</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">align =</span> <span class="st">'c'</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">escape =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">"Parámetros del modelo escogido"</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">col.names =</span> <span class="st">"Estimación"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Parámetros del modelo escogido</caption>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: center;">Estimación</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>nugget</td>
+<td style="text-align: center;">7.1340e-01</td>
+</tr>
+<tr class="even">
+<td>power_s</td>
+<td style="text-align: center;">2.0000e+00</td>
+</tr>
+<tr class="odd">
+<td>power_t</td>
+<td style="text-align: center;">2.0000e+00</td>
+</tr>
+<tr class="even">
+<td>scale_s</td>
+<td style="text-align: center;">2.0000e+05</td>
+</tr>
+<tr class="odd">
+<td>scale_t</td>
+<td style="text-align: center;">7.8320e-01</td>
+</tr>
+<tr class="even">
+<td>sep</td>
+<td style="text-align: center;">0.0000e+00</td>
+</tr>
+<tr class="odd">
+<td>sill</td>
+<td style="text-align: center;">1.4624e+00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Se carga el grid para poder realizar la predicción. Además, se considerarán tres horizontes.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>grid <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"grid.csv"</span>, <span class="at">check.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>loc_to_pred <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">as.data.frame</span>(grid))</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>times_to_pred <span class="ot">&lt;-</span> <span class="dv">9</span><span class="sc">:</span><span class="dv">11</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Se realiza el kriging espacio tiempo con ayuda de la función <code>GeoKrige</code>. De igual forma, por eficiencia, se guardaron los resultados en un archivo y se importan para su análisis.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ST.Krige <span class="ot">&lt;-</span> <span class="fu">GeoKrig</span>(<span class="at">estobj =</span> geofitST<span class="sc">$</span>Gneiting,</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">loc =</span> loc_to_pred,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">time =</span> times_to_pred,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">mse =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Se muestran los resultados a continuación.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>preds_ST <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"kriging.ST.csv"</span>, <span class="at">check.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>Temp.st.or <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(Temp.st) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>     <span class="fu">arrange</span>(Day, AQSID) <span class="sc">%&gt;%</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>     <span class="fu">select</span>(Day, AQSID, Temp) <span class="sc">%&gt;%</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>     tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> AQSID, <span class="at">values_from =</span> Temp) <span class="sc">%&gt;%</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>     <span class="fu">arrange</span>(Day) <span class="sc">%&gt;%</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>     <span class="fu">select</span>(<span class="sc">-</span>Day) <span class="sc">%&gt;%</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>     <span class="fu">as.matrix</span>()</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>t1 <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(Temp.st) <span class="sc">%&gt;%</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(Day <span class="sc">==</span> <span class="dv">90</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lm</span>(Temp <span class="sc">~</span> X <span class="sc">+</span> Y <span class="sc">+</span> <span class="fu">I</span>(X<span class="sc">^</span><span class="dv">2</span>), <span class="at">data =</span> .)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>mu.temp <span class="ot">&lt;-</span> <span class="cf">function</span>(coefs, X, Y){</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  beta0 <span class="ot">&lt;-</span> coefs[<span class="dv">1</span>]</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>  beta1 <span class="ot">&lt;-</span> coefs[<span class="dv">2</span>]</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>  beta2 <span class="ot">&lt;-</span> coefs[<span class="dv">3</span>]</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  beta3 <span class="ot">&lt;-</span> coefs[<span class="dv">4</span>]</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>  beta0 <span class="sc">+</span> beta1 <span class="sc">*</span> X <span class="sc">+</span> beta2 <span class="sc">*</span> Y <span class="sc">+</span> beta3 <span class="sc">*</span> X<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>preds.mu <span class="ot">&lt;-</span> <span class="fu">mu.temp</span>(<span class="fu">coef</span>(t1), loc_to_pred[,<span class="dv">1</span>], loc_to_pred[,<span class="dv">2</span>])</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>grid_ST <span class="ot">&lt;-</span> grid</span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>grid_ST<span class="sc">$</span>t1 <span class="ot">&lt;-</span> preds_ST<span class="sc">$</span>t1 <span class="sc">+</span> preds.mu</span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>grid_ST<span class="sc">$</span>t2 <span class="ot">&lt;-</span> preds_ST<span class="sc">$</span>t2 <span class="sc">+</span> preds.mu</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>grid_ST<span class="sc">$</span>t3 <span class="ot">&lt;-</span> preds_ST<span class="sc">$</span>t3 <span class="sc">+</span> preds.mu</span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>grid_ST <span class="ot">&lt;-</span> <span class="fu">cbind</span>(grid_ST, preds_ST[,<span class="fu">c</span>(<span class="st">"mse1"</span>, <span class="st">"mse2"</span>, <span class="st">"mse3"</span>)])</span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>pred_vars <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"t"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>mse_vars  <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"mse"</span>,  <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a><span class="fu">coordinates</span>(grid_ST) <span class="ot">&lt;-</span> <span class="er">~</span> X<span class="sc">+</span> Y</span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>plot_list <span class="ot">&lt;-</span> <span class="fu">list</span>()  <span class="co"># para guardar las figuras </span></span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>) {</span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a>  pred_var <span class="ot">&lt;-</span> pred_vars[i]   </span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a>  mse_var  <span class="ot">&lt;-</span> mse_vars[i]   </span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Predicción </span></span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a>  rng_pred <span class="ot">&lt;-</span> <span class="fu">range</span>(grid_ST[[pred_var]], <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a>  at_pred  <span class="ot">&lt;-</span> <span class="fu">pretty</span>(rng_pred, <span class="at">n =</span> <span class="dv">8</span>)</span>
+<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a>  p_pred <span class="ot">&lt;-</span> <span class="fu">spplot</span>(</span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a>    grid_ST, pred_var,</span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">colorkey =</span> <span class="fu">list</span>(</span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a>      <span class="at">right =</span> <span class="fu">list</span>(</span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a>        <span class="at">fun  =</span> draw.colorkey,</span>
+<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a>        <span class="at">args =</span> <span class="fu">list</span>(</span>
+<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a>          <span class="at">key =</span> <span class="fu">list</span>(</span>
+<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a>            <span class="at">at   =</span> at_pred,</span>
+<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a>            <span class="at">col  =</span> <span class="fu">magma</span>(<span class="dv">100</span>),</span>
+<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a>            <span class="at">labels =</span> <span class="fu">list</span>(<span class="at">at =</span> at_pred)</span>
+<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a>          )</span>
+<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb12-68"><a href="#cb12-68" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb12-69"><a href="#cb12-69" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.regions =</span> <span class="fu">magma</span>(<span class="dv">100</span>),</span>
+<span id="cb12-70"><a href="#cb12-70" aria-hidden="true" tabindex="-1"></a>    <span class="at">main =</span> <span class="fu">paste</span>(<span class="st">"Predicción Temperatura t ="</span>, i)</span>
+<span id="cb12-71"><a href="#cb12-71" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb12-72"><a href="#cb12-72" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-73"><a href="#cb12-73" aria-hidden="true" tabindex="-1"></a>  <span class="do">## --- MSE ---</span></span>
+<span id="cb12-74"><a href="#cb12-74" aria-hidden="true" tabindex="-1"></a>  rng_mse <span class="ot">&lt;-</span> <span class="fu">range</span>(grid_ST[[mse_var]], <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb12-75"><a href="#cb12-75" aria-hidden="true" tabindex="-1"></a>  at_mse  <span class="ot">&lt;-</span> <span class="fu">pretty</span>(rng_mse, <span class="at">n =</span> <span class="dv">8</span>)</span>
+<span id="cb12-76"><a href="#cb12-76" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-77"><a href="#cb12-77" aria-hidden="true" tabindex="-1"></a>  p_mse <span class="ot">&lt;-</span> <span class="fu">spplot</span>(</span>
+<span id="cb12-78"><a href="#cb12-78" aria-hidden="true" tabindex="-1"></a>    grid_ST, mse_var,</span>
+<span id="cb12-79"><a href="#cb12-79" aria-hidden="true" tabindex="-1"></a>    <span class="at">colorkey =</span> <span class="fu">list</span>(</span>
+<span id="cb12-80"><a href="#cb12-80" aria-hidden="true" tabindex="-1"></a>      <span class="at">right =</span> <span class="fu">list</span>(</span>
+<span id="cb12-81"><a href="#cb12-81" aria-hidden="true" tabindex="-1"></a>        <span class="at">fun  =</span> draw.colorkey,</span>
+<span id="cb12-82"><a href="#cb12-82" aria-hidden="true" tabindex="-1"></a>        <span class="at">args =</span> <span class="fu">list</span>(</span>
+<span id="cb12-83"><a href="#cb12-83" aria-hidden="true" tabindex="-1"></a>          <span class="at">key =</span> <span class="fu">list</span>(</span>
+<span id="cb12-84"><a href="#cb12-84" aria-hidden="true" tabindex="-1"></a>            <span class="at">at   =</span> at_mse,</span>
+<span id="cb12-85"><a href="#cb12-85" aria-hidden="true" tabindex="-1"></a>            <span class="at">col  =</span> <span class="fu">inferno</span>(<span class="dv">100</span>),</span>
+<span id="cb12-86"><a href="#cb12-86" aria-hidden="true" tabindex="-1"></a>            <span class="at">labels =</span> <span class="fu">list</span>(<span class="at">at =</span> at_mse)</span>
+<span id="cb12-87"><a href="#cb12-87" aria-hidden="true" tabindex="-1"></a>          )</span>
+<span id="cb12-88"><a href="#cb12-88" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb12-89"><a href="#cb12-89" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb12-90"><a href="#cb12-90" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb12-91"><a href="#cb12-91" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.regions =</span> <span class="fu">inferno</span>(<span class="dv">100</span>),</span>
+<span id="cb12-92"><a href="#cb12-92" aria-hidden="true" tabindex="-1"></a>    <span class="at">main =</span> <span class="fu">paste</span>(<span class="st">"Error de Predicción t ="</span>, i)</span>
+<span id="cb12-93"><a href="#cb12-93" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb12-94"><a href="#cb12-94" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-95"><a href="#cb12-95" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-96"><a href="#cb12-96" aria-hidden="true" tabindex="-1"></a>  gridExtra<span class="sc">::</span><span class="fu">grid.arrange</span>(p_pred, p_mse, <span class="at">ncol =</span> <span class="dv">2</span>)</span>
+<span id="cb12-97"><a href="#cb12-97" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-98"><a href="#cb12-98" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-99"><a href="#cb12-99" aria-hidden="true" tabindex="-1"></a>  plot_list[[<span class="fu">paste0</span>(<span class="st">"t"</span>, i)]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">pred =</span> p_pred, <span class="at">mse =</span> p_mse)</span>
+<span id="cb12-100"><a href="#cb12-100" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="spacetime_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="spacetime_files/figure-html/unnamed-chunk-16-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="spacetime_files/figure-html/unnamed-chunk-16-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Primero, podemos ver que en los lugares donde hay estaciones, el error es menor, lo cual es de esperar. Por otro lado, las predicciones parecen no cambiar mucho en estos tres días.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

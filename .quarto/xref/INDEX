@@ -4,5 +4,23 @@
   },
   "about.qmd": {
     "about.html": "a6566cbb"
+  },
+  "geostatistics/fd.qmd": {
+    "fd.html": "0217e91f"
+  },
+  "geostatistics/ozone.qmd": {
+    "ozone.html": "68fd8bea"
+  },
+  "geostatistics/spacetime.qmd": {
+    "spacetime.html": "b2eb5eef"
+  },
+  "geostatistics/temp.qmd": {
+    "temp.html": "461c5313"
+  },
+  "geostatistics/index.qmd": {
+    "index.html": "a30688a5"
+  },
+  "arealdata/datos_area.qmd": {
+    "datos_area.html": "d2ccfb94"
   }
 }

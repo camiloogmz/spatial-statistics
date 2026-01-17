@@ -8,12 +8,37 @@ website:
     left:
       - href: index.qmd
         text: Home
+        
+      - text: Geostatistics
+        menu:
+          - text: Overview
+            href: geostatistics/index.qmd
+          - text: Temperature
+            href: geostatistics/temp.qmd
+          - text: Ozone
+            href: geostatistics/ozone.qmd
+          - text: Spatio-temporal
+            href: geostatistics/spacetime.qmd
+          - text: Functional data
+            href: geostatistics/fd.qmd
+            
+      - href: arealdata/datos_area.qmd
+        text: Areal Data
+        
       - about.qmd
+      
+  page-footer: 
+    left: "Copyright 2025, Camilo Gómez" 
+    right: 
+      - icon: github
+        href: https://github.com/camiloogmz
+      - icon: linkedin 
+        href: https://www.linkedin.com/in/camiloogmz/
 
 format:
   html:
     theme:
-      - cosmo
+      - journal
       - brand
     css: styles.css
     toc: true

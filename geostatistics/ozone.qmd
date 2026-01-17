@@ -1,0 +1,812 @@
+---
+title: "Análisis del Ozono"
+format: html
+---
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+
+library(fields)
+library(geoR)
+library(akima)
+library(dplyr)
+library(sqldf)
+library(dplyr)
+library(tidyr)
+library(sp)
+library(sf)
+library(maps)
+library(ggplot2)
+library(gstat)
+library(GeoModels)
+library(mvtnorm)
+library(mapview)
+library(tigris)
+options(tigris_use_cache = TRUE) 
+library(minpack.lm)
+library(lubridate)
+library(lattice)
+
+library(kableExtra)
+```
+
+
+## Descripción
+
+Se muestra el mapa de la distribución espacial de las estaciones en el estado de Texas, Estados Unidos.
+
+```{r}
+#| code-fold: true
+
+OZ <- read.csv("G:/Mi unidad/Camilo UNAL/Estadística Espacial/Proyecto/Datos/TexasOZone2024.csv")
+
+OZ_stations <- OZ %>% 
+  distinct(Site.ID, .keep_all = TRUE) %>% 
+  dplyr::select(Site.ID, Site.Longitude, Site.Latitude) %>% 
+  rename(ID = Site.ID)
+
+
+coords_sf <- st_as_sf(OZ_stations, coords = c("Site.Longitude", "Site.Latitude"), crs = 4326)
+
+crs_texas <- 3083
+
+coords_proj <- st_transform(coords_sf, crs = crs_texas)
+
+## Coordenadas planas ----
+
+texas_coords <- st_coordinates(coords_proj)
+
+OZ_stations$X <- texas_coords[,1]
+OZ_stations$Y <- texas_coords[,2]
+
+
+
+
+OZ <- read.csv("G:/Mi unidad/Camilo UNAL/Estadística Espacial/Proyecto/Primera Entrega/OZ.csv", check.names = FALSE)[,-1]
+
+## Mapa con Datos Ozono ----
+
+OZ_map <- coords_proj %>%
+  left_join(OZ, by = "ID") %>% 
+  na.omit()
+
+mapview(OZ_map, 
+        zcol = "Ozone", 
+        legend = TRUE, 
+        cex = 7, 
+        col.regions = viridisLite::viridis, 
+        popup = OZ_map$Site.ID,
+        layer.name = "Ozono (ppb)")
+
+```
+
+
+Como se puede apreciar, no hay muchas estaciones hacia el noroccidente de Texas. Además de esto, se muestran los valores de Ozono.
+
+
+## Análisis de Estacionariedad
+
+A continuación se presenta el resúmen visual de los datos de Ozono en Texas. De igual forma, también se muestra el gráfico del Ozono vs Coordenadas.
+
+```{r}
+#| label: datos ozono
+OZ$OzC <- residuals(lm(Ozone ~ 1, data = OZ))
+
+OZg <- as.geodata(OZ,
+                  coords.col = 2:3,
+                  data.col = 5)
+
+plot(OZg)
+
+```
+
+```{r}
+#| label: estacionariedad ozono
+par(mfrow = c(2, 1), mar = c(2.75, 3, 0.5, 0.5), mgp = c(1.7, 0.7, 0))
+
+plot(x = OZ$Ozone, y = OZ$Northing,
+     xlab = "Ozono", ylab = "Norte",
+     col = "lightblue3")
+
+plot(x = OZ$Easting, y = OZ$Ozone,
+     xlab = "Este", ylab = "Ozono",
+     col = "tomato")
+```
+
+De estos gráficos es posible ver que la variable presenta estacionariedad con respecto a la media y, además, no se evidencian problemas con respecto a heteroscedasticidad. Por lo tanto, no es necesario ajustar un modelo lineal para intentar alcanzar estacionariedad.
+
+
+
+## Semivariograma
+
+A pesar de haber ajustado el modelo lineal, el Ozono en Texas parece ser estacionario desde un comienzo. De esta forma, se halla el semivariograma empírico para estos dos casos.
+
+### Datos originales
+
+```{r}
+#| echo: false
+#| message: false
+vargrm1 <- variog(OZg, trend = "cte")
+
+plot(vargrm1, pch = 19, col = "springgreen3",
+     xlab = "Distancia",
+     ylab = "Semivarianza",
+     main = "Variograma empírico de Ozono (O3) en Texas 2024")
+
+lines(vargrm1$u, vargrm1$v, col = "springgreen3")
+```
+
+Como se espera, a puntos cercanos hay menor variabilidad en cuanto a la semivarianza. Se puede ver que se presenta un efecto pepita pequeño, pues la semivarianza no pasa por el orígen. Además, se puede ver que el rango ocurre en aproximadamente $400.000$ unidades de distancia.
+
+### Resistente a datos atípicos
+
+```{r}
+#| echo: false
+#| message: false
+vg1_at <- variog(OZg, trend = "cte",
+                 estimator.type = "modulus")
+
+plot(vg1_at, pch = 19, col = "springgreen4",
+     xlab = "Distancia",
+     ylab = "Semivarianza",
+     main = "Variograma empírico de Ozono (O3) en Texas 2024
+             (Robusto)")
+
+lines(vg1_at$u, vg1_at$v, col = "springgreen4")
+```
+
+Es posible ver que es similar al semivariograma basado en el promedio. Esto se puede estar dando debido a que no hay presencia de datos atípicos que estén afectando el nivel medio de la variable.
+
+
+### Estimación teórica del semivariograma
+
+Con base en la sección de *Modelos válidos para el semivariograma*, vemos que los que más se asimilan al semivariograma empírico son el **Gaussiano**, **Cúbico** y **Matern**.
+
+Por lo tanto, con ayuda de la función eyefit, inicialmente ajustamos a "ojo" los parámetros del modelo gaussiano que se ajusta a los datos de Ozono:
+
+```{r}
+#| code-fold: show
+init_gau <- c(c0 = 10, cs = 34.88, a = 9e+05)
+init_mat <- c(c0 = 10, cs = 46.5, a = 1036220.5, kappa = 0.7)
+init_cub <- c(c0 = 10, cs = 28.42, a = 1727035.38)
+```
+
+Entonces, los semivariogramas con estos parámetros iniciales se ven de la siguiente forma:
+
+
+```{r}
+#| code-fold: true
+
+gamma_gaus <- function(h, c0, cs, a){
+  ifelse(h == 0,
+         0,
+         c0 + cs*(1 - exp(-(h/a)^2)))
+}
+
+
+gamma_mat <- function(h, c0, cs, a, kappa){
+  ifelse(h == 0,
+         0,
+         c0 + cs * (1 - ((h / a)^kappa * besselK(h / a, nu = kappa)) /
+                      (2^(kappa - 1) * gamma(kappa)))
+  )
+}
+
+gamma_cub <- function(h, c0, cs, a) {
+  ifelse(
+    h == 0, 
+    0,
+    ifelse(
+      h <= a,  
+      c0 + cs * (7*(h/a)^2 - 8.75*(h/a)^3 + 3.5*(h/a)^5 - 0.75*(h/a)^7),
+      c0 + cs   
+    )
+  )
+}
+
+MSE <- function(fitted, observed){
+  
+  mean((fitted - observed)^2)
+  
+}
+
+```
+
+
+```{r message=FALSE, warning=FALSE}
+#| echo: false
+fitvar1 <- gamma_gaus(h = vargrm1$u, c0 = 10, cs = 34.88, a = 9e5)
+
+fitvar2 <- gamma_mat(h = vargrm1$u, c0 = 10, cs = 46.5, a = 1036220.5, kappa = 0.7)
+
+fitvar3 <- gamma_cub(h = vargrm1$u, c0 = 10, cs = 28.42, a = 1934000)
+
+
+plot(vargrm1, pch = 19,
+     xlab = "Distancia",
+     ylab = "Semivarianza",
+     main = "Estimación teórica")
+
+lines(x = vargrm1$u,
+      y = fitvar1,
+      col = "orange2",
+      lwd = 2)
+lines(x = vargrm1$u,
+      y = fitvar2,
+      col = "orchid3",
+      lwd = 2)
+lines(x = vargrm1$u,
+      y = fitvar3,
+      col = "steelblue2",
+      lwd = 2)
+
+legend("topleft",
+       legend = c("Gaussiano", "Matern", "Cúbico"),
+       col = c("orange2", "orchid3", "steelblue2"),
+       lty = 1,
+       lwd = 2)
+
+```
+
+
+
+#### Regresión No Lineal
+
+Ahora, con los valores iniciales escogidos anteriormente, realizamos la estimación de los parámetros mediante regresión no lineal.
+
+```{r}
+#| code-fold: true
+#| message: false
+#| warning: false
+
+library(minpack.lm)
+
+data_OZ <- data.frame(h = vargrm1$u,
+                      gamma_est = vargrm1$v,
+                      n = vargrm1$n)
+
+
+# Gausiano
+nls.gaus1 <- nls(gamma_est ~ gamma_gaus(h, c0, cs, a),
+                 data = data_OZ,
+                 start = as.list(init_gau))
+
+nls.gaus2 <- nls(gamma_est ~ gamma_gaus(h, c0, cs, a),
+                  data = data_OZ,
+                  start = as.list(init_gau),
+                  weights = n)
+
+nls.gaus3 <- nlsLM(gamma_est ~ gamma_gaus(h, c0, cs, a),
+                   data = data_OZ, 
+                   start = as.list(init_gau),
+                   weights = (n/h^2),
+                   control = nls.lm.control(maxiter=1000, ftol=1e-10, ptol=1e-10))
+
+
+# Cúbico
+
+nls.cub1 <- nls(gamma_est ~ gamma_cub(h, c0, cs, a),
+                data = data_OZ,
+                start = as.list(init_cub))
+
+nls.cub2 <- nls(gamma_est ~ gamma_cub(h, c0, cs, a),
+                data = data_OZ,
+                start = as.list(init_cub), 
+                weights = n)
+
+nls.cub3 <- nlsLM(gamma_est ~ gamma_cub(h, c0, cs, a),
+                  data = data_OZ, 
+                  start = as.list(init_cub),
+                  weights = (n/h^2),
+                  control = nls.lm.control(maxiter=1000, ftol=1e-10, ptol=1e-10))
+
+# Mátern
+
+nls.mat1 <- nls(gamma_est ~ gamma_mat(h, c0, cs, a, kappa = 0.7),
+                data = data_OZ,
+                start = as.list(init_mat[-4]))
+
+nls.mat2 <- nlsLM(gamma_est ~ gamma_mat(h, c0, cs, a, kappa = 0.7),
+                 data = data_OZ,
+                 start = as.list(init_mat[-4]), 
+                 weights = n,
+                 control = nls.lm.control(maxiter=1000, ftol=1e-10, ptol=1e-10))
+
+nls.mat3 <- nlsLM(gamma_est ~ gamma_mat(h, c0, cs, a, kappa = 0.7),
+                  data = data_OZ, 
+                  start = as.list(init_mat[-4]),
+                  weights = (n/h^2),
+                  control = nls.lm.control(maxiter=1000, ftol=1e-10, ptol=1e-10))
+
+```
+
+```{r}
+#| echo: false 
+#| code-fold: false
+fits <- list(
+  gaus1 = nls.gaus1, gaus2 = nls.gaus2, gaus3 = nls.gaus3,
+  cub1 = nls.cub1, cub2 = nls.cub2, cub3 = nls.cub3,
+  mat1 = nls.mat1, mat2 = nls.mat2, mat3 = nls.mat3
+)
+
+mse_models <- sapply(fits, function(fit) {
+  pr <- try(fitted(fit), silent = TRUE)
+  if (inherits(pr, "try-error")) return(NA_real_)
+  MSE(pr, data_OZ$gamma_est)
+})
+
+mse_tab <- data.frame(modelo = rep(c("Gausiano", "Cúbico", "Mátern"), each = 3),
+                      MSE = as.numeric(mse_models),
+                      peso = rep(c("$1$", "$n$", "$\\frac{n}{h^2}$"), 3))
+
+tab_nls <- mse_tab %>%
+  group_by(modelo) %>%
+  slice_min(MSE, n = 1, with_ties = FALSE) # el mejor es sin pesos
+
+
+kable(mse_tab,
+      format = "pandoc",
+      col.names = c("Modelo", "MSE", "Peso"),
+      digits = 4,
+      escape = FALSE)
+
+
+```
+
+Además de comparar las gráficas de los mejores
+
+::: panel-tabset
+##### Gaussiano
+
+```{r}
+#| echo: false
+#| code-fold: true
+
+plot(
+  vargrm1,
+  xlab = "Distancia",
+  ylab = "Semivarianza",
+  main = "Semivariograma teórico - Modelo Gaussiano",
+  type = "p",
+  pch  = 19
+)
+
+lines(x = data_OZ$h, y = fitted(nls.gaus1),
+      lty = "solid",   lwd = 2, col = "dodgerblue2")
+lines(x = data_OZ$h, y = fitted(nls.gaus2),
+      lty = "dashed",  lwd = 2, col = "tomato3")
+lines(x = data_OZ$h, y = fitted(nls.gaus3),
+      lty = "dotdash", lwd = 2, col = "springgreen3")
+
+legend("bottomright",
+       legend = c("1", expression(n), expression(frac(n, h^2))),
+       col    = c("dodgerblue2", "tomato3", "springgreen3"),
+       lwd    = 2,
+       lty    = c("solid", "dashed", "dotdash"),
+       cex    = 0.9)
+```
+
+##### Cúbico
+
+```{r}
+#| echo: false
+#| code-fold: true
+
+plot(
+  vargrm1,
+  xlab = "Distancia",
+  ylab = "Semivarianza",
+  main = "Semivariograma teórico - Modelo Cúbico",
+  type = "p",
+  pch  = 19
+)
+
+lines(x = data_OZ$h, y = fitted(nls.cub1),
+      lty = "solid",   lwd = 2, col = "dodgerblue2")
+lines(x = data_OZ$h, y = fitted(nls.cub2),
+      lty = "dashed",  lwd = 2, col = "tomato3")
+lines(x = data_OZ$h, y = fitted(nls.cub3),
+      lty = "dotdash", lwd = 2, col = "springgreen3")
+
+legend("bottomright",
+       legend = c("1", expression(n), expression(frac(n, h^2))),
+       col    = c("dodgerblue2", "tomato3", "springgreen3"),
+       lwd    = 2,
+       lty    = c("solid", "dashed", "dotdash"),
+       cex    = 0.9)
+```
+
+##### Mátern
+
+```{r}
+#| echo: false
+#| code-fold: true
+
+plot(
+  vargrm1,
+  xlab = "Distancia",
+  ylab = "Semivarianza",
+  main = "Semivariograma teórico - Modelo Mátern",
+  type = "p",
+  pch  = 19
+)
+
+lines(x = data_OZ$h, y = fitted(nls.mat1),
+      lty = "solid",   lwd = 2, col = "dodgerblue2")
+lines(x = data_OZ$h, y = fitted(nls.mat2),
+      lty = "dashed",  lwd = 2, col = "tomato3")
+lines(x = data_OZ$h, y = fitted(nls.mat3),
+      lty = "dotdash", lwd = 2, col = "springgreen3")
+
+legend("bottomright",
+       legend = c("1", expression(n), expression(frac(n, h^2))),
+       col    = c("dodgerblue2", "tomato3", "springgreen3"),
+       lwd    = 2,
+       lty    = c("solid", "dashed", "dotdash"),
+       cex    = 0.9)
+```
+:::
+
+Tanto con la gráfica como con el MSE, nos damos cuenta que el modelo no lineal en el que no se considera una matriz de ponderación se ajusta de mejor forma al semivariograma empírico. Se presentan los coeficientes estimados por este método:
+
+```{r, echo=FALSE}
+#| echo: false
+temp_coefgauss <- c("$c_0$", "$c_s$", "$a$")
+
+kable(cbind(temp_coefgauss, round(as.numeric(coef(nls.gaus1)), 4)),
+      col.names = c("Parámetro", "Estimación"),
+      format = "pandoc",
+      align = "c",
+      escape = FALSE,
+      caption = "Mejor modelo no lineal") %>%
+      kable_styling(position = "center",
+                    full_width = FALSE)
+```
+
+
+
+
+
+#### Cressie
+
+Se define la función que nos ayudará a realizar la estimación de los parámetros de los distintos modelos.
+
+```{r}
+#| code-fold: true
+
+Q_cressie <- function(par, data, gamma_fun, kappa = NULL, eps = 1e-12){
+  
+  g <- if (is.null(kappa)) {
+    gamma_fun(h = data$h, c0 = par["c0"], cs = par["cs"], a = par["a"])
+    
+  } else {
+    
+    gamma_fun(h = data$h, c0 = par["c0"], cs = par["cs"], a = par["a"], kappa = kappa)
+    
+  }
+  
+  g2 <- pmax(g^2, eps)         
+  
+  sum( data$n * (data$gamma_hat - g)^2 / (2 * g2), na.rm = TRUE )
+}
+
+
+fit_cressie <- function(gamma_fun, start, data,
+                        lower = c(c0=0, cs=0, a=.Machine$double.eps),
+                        upper = c(c0=Inf, cs=Inf, a=Inf),
+                        kappa = NULL){
+  
+  par0 <- start[c("c0","cs","a")]    
+  
+  opt <- optim(par = par0, fn = Q_cressie, method = "L-BFGS-B",
+               lower = lower, upper = upper,
+               data = data, gamma_fun = gamma_fun, kappa = kappa)
+  
+  
+  p  <- opt$par
+  
+  g  <- if (is.null(kappa)) {
+    gamma_fun(data$h, p["c0"], p["cs"], p["a"])
+  } else {
+    gamma_fun(data$h, p["c0"], p["cs"], p["a"], kappa)
+  }    
+  
+  mse <- MSE(g, data$gamma_est)
+  
+  list(par = p, converged = (opt$convergence==0),
+       fitted = g, MSE = mse, kappa = kappa)
+}
+
+```
+
+De esta forma, aplicamos la función a cada modelo haciendo uso, además, de **optim**. Vea que en este caso, la matriz de ponderaciones cambia con cada iteración.
+
+```{r}
+#| echo: false
+#| code-fold: true
+
+cress.cub <- fit_cressie(gamma_cub, start = init_gau, data = data_OZ)
+
+cress.gaus <- fit_cressie(gamma_gaus, start = init_gau, data = data_OZ)
+
+cress.mat <- fit_cressie(gamma_mat, start = init_mat, data = data_OZ, kappa = 0.7)
+```
+
+Los resultados se presentan a continuación:
+
+```{r}
+#| echo: false
+#| code-fold: false
+
+fits_Cressie <- list(cub = cress.cub, 
+                     gaus = cress.gaus, 
+                     mat = cress.mat)
+
+
+tab_Cressie <- do.call(rbind, lapply(names(fits_Cressie), function(n)
+  data.frame(Modelo = n, MSE=fits_Cressie[[n]]$MSE)))
+
+tab_Cressie %>% 
+  mutate(Modelo = recode(Modelo, 
+                         "cub" = "Cúbico",
+                         "gaus" = "Gausiano",
+                         "mat" = "Mátern")) %>% 
+  kable(digits = 4,
+      col.names = c("Modelo", "MSE"), 
+      escape = FALSE)
+```
+
+Como es posible apreciar, de nuevo el modelo Gausiano nos muestra un mejor ajuste. Aún así, el ajuste obtenido por **nls** fue mejor.
+
+#### Máxima Verosimilitud
+
+Primero, es importante considerar las funciones de Covarianza de los modelos que se están considerando para la variable de Ozono. Además de esto, también se define una función general que permite usar la función de log-verosimilitud en general para poder realizar la optimización.
+
+```{r}
+#| code-fold: true
+
+
+cov.gaus <- function(h, c0, cs, a){
+  ifelse(h == 0,
+         c0 + cs,
+         cs * exp(-(h/a)^2))
+}
+
+cov.mat <- function(h, c0, cs, a, kappa = 1.35){
+  ifelse(h == 0,
+         c0 + cs,
+         cs * (1 - (1 - ((h / a)^kappa * besselK(h / a, nu = kappa)) /
+                 (2^(kappa - 1) * gamma(kappa)))))
+}
+
+loglik.model <- function(par, Z, coords, cov.model) {
+  c0 <- par[1]  
+  cs <- par[2]   
+  a  <- par[3]   
+  
+  
+  h <- as.matrix(dist(coords))
+  
+  
+  Sigma <- cov.model(h, c0, cs, a)
+  
+  
+  n <- length(Z)
+  L <- try(chol(Sigma), silent = TRUE)
+  if (inherits(L, "try-error")) return(1e6)
+  
+  
+  SinvZ <- backsolve(L, forwardsolve(t(L), Z))
+  
+  logdet <- 2 * sum(log(diag(L)))
+  nll <- 0.5 * (n * log(2*pi) + logdet + sum(Z * SinvZ))
+  
+  return(nll)  
+}
+
+```
+
+De esta forma, se realiza el ajuste por máxima verosimilitud con la función optim.
+
+```{r}
+#| code-fold: true
+
+
+coordinates(OZ) <- ~ Easting + Northing
+
+mv.gaus <- optim(
+  par = coef(nls.gaus1),
+  fn = loglik.model,
+  Z = OZ$OzC,
+  coords = coordinates(OZ),
+  cov.model = cov.gaus,
+  method = "L-BFGS-B",
+  lower = c(0, 0, 0)
+)
+
+mv.gaus <- within(mv.gaus, {
+  MSE        <- with(as.list(par), MSE(gamma_gaus(data_OZ$h, c0, cs, a), data_OZ$gamma_est))
+  gamma_pred <- with(as.list(par), gamma_gaus(data_OZ$h, c0, cs, a))
+})
+
+
+mv.mat <- optim(
+  par = init_mat,
+  fn = loglik.model,
+  Z = OZ$OzC,
+  coords = coordinates(OZ),
+  cov.model = cov.mat,
+  method = "L-BFGS-B",
+  lower = c(0, 0, 0)
+)
+
+mv.mat <- within(mv.mat, {
+  MSE        <- with(as.list(par), MSE(gamma_mat(data_OZ$h, c0, cs, a, kappa = 0.7), data_OZ$gamma_est))
+  gamma_pred <- with(as.list(par), gamma_mat(data_OZ$h, c0, cs, a, kappa = 0.7))
+})
+```
+
+Y se presentan los resultados:
+
+```{r}
+#| echo: false
+#| code-fold: false
+#| warning: false
+#| message: false
+
+
+fits_mv <- list(Gausiano    = mv.gaus,
+                Matern      = mv.mat)
+
+
+
+tab_mv <- do.call(rbind, lapply(names(fits_mv), function(nm){
+    data.frame(
+    Modelo = nm,
+    MSE = fits_mv[[nm]]$MSE,
+    row.names = NULL,
+    check.names = FALSE
+  )
+}))
+
+
+tab_mv %>% kable(digits = 4,
+                 col.names = c("Modelo", "MSE"), 
+                 escape = FALSE, 
+                 caption = "Comparación de estimaciones MV")
+
+```
+
+
+## Kriging Ordinario
+
+Basado en los resultados pasados, vimos que el mejor modelo fue el Gausiano con la estimación de los parámetros a través de la función **nls**.
+
+Primero, se genera la grilla de valores para poder realizar la interpolación.
+
+```{r}
+grid <- read.csv("grid.csv", check.names = FALSE)
+
+coordinates(grid) <- ~ X + Y
+```
+
+Veamos primero el modelo ajustado.
+
+```{r}
+#| code-fold: true
+#| warning: false
+
+best_model <- vgm(psill = 34.509, 
+                  model = "Gau", 
+                  range = 857720.5474, 
+                  nugget = 9.8194)
+
+
+vgm <- variogram(Ozone ~ 1, data = OZ, cutoff = max(dist(coordinates(OZ))))
+
+plot(vgm, best_model, 
+     lwd = 2, col = "dodgerblue2",
+     main = "Mejor modelo ajustado para la variable Ozono")
+```
+
+Y se realiza el kriging ordinario basado en este modelo.
+
+```{r}
+#| code-fold: true
+#| warning: false
+
+krige.oz <- gstat::krige(
+  Ozone ~ 1,
+  locations = OZ,
+  newdata = grid,
+  model = best_model, maxdist = 1/3 * max(dist(coordinates(OZ))), nmax = 60)
+```
+
+::: panel-tabset
+### Predicción
+
+```{r}
+#| code-fold: true
+#| warning: false
+
+Stations_sp <- as(coords_proj, "Spatial")
+
+stations_layer <- list(
+  "sp.points",
+  Stations_sp,
+  pch = 21,      
+  cex = 1.6,
+  bg = viridis(100),
+  col = "black")
+
+rng    <- range(krige.oz$var1.pred, na.rm = TRUE)
+
+at_lab <- pretty(rng, n = 10)          
+
+spplot(krige.oz, "var1.pred", colorkey = list(
+        right = list(
+          fun = draw.colorkey,
+          args = list(
+            key = list(
+              at = at_lab,
+              col = viridis(100),
+              labels = list(
+                at = at_lab
+              )
+            )
+          )
+        )
+      ), 
+      col.regions = viridis(100),
+      sp.layout   = list(stations_layer),
+      main = "Mapa de Predicción del Ozono (ppb)")
+```
+
+### Error de Predicción
+
+```{r}
+#| code-fold: true
+#| warning: false
+
+
+stations_layer <- list(
+  "sp.points",
+  Stations_sp,
+  pch = 21,      
+  cex = 1.6,
+  bg = viridis(100),
+  col = "white")
+
+rng    <- range(krige.oz$var1.var, na.rm = TRUE)
+
+at_lab <- pretty(rng, n = 10)  
+
+spplot(krige.oz, "var1.var", colorkey = list(
+        right = list(
+          fun = draw.colorkey,
+          args = list(
+            key = list(
+              at = at_lab,
+              col = magma(100),
+              labels = list(
+                at = at_lab
+              )
+            )
+          )
+        )
+      ), 
+      col.regions = magma(100),
+      sp.layout   = list(stations_layer),
+      main = "Error de Predicción del Ozono (ppb)")
+```
+:::
+
+
+Es posible ver que en hacia el occidente de Texas se presentan los valores más bajos de Ozono, mientras que en el oriente y, más especificamente hacia el suroriente, se presentan los valores más altos de ozono. Además, como es de esperarse, los errores de predicción más bajos se encuentran sobre la zona donde se tienen  más estaciones, mientras que los más altos donde se tienen pocas.
+
+
+
+
