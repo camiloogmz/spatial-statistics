@@ -19,7 +19,7 @@ website:
             href: geostatistics/ozone.qmd
           - text: Spatio-temporal
             href: geostatistics/spacetime.qmd
-          - text: Functional data
+          - text: Functional Data Analysis
             href: geostatistics/fd.qmd
             
       - href: arealdata/datos_area.qmd
